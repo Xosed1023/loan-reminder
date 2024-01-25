@@ -1,0 +1,12 @@
+.splash-info {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    height: 100vh;
+    animation: slide-fwd-center 0.45s;
+
+    img {
+        width: 200px;
+    }
+}
