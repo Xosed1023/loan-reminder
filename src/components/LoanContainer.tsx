@@ -1,4 +1,4 @@
-import { IonAvatar, IonItem, IonItemOption, IonItemOptions, IonItemSliding, IonLabel, IonList, IonThumbnail } from "@ionic/react"
+import { IonAvatar, IonItem, IonItemOption, IonItemOptions, IonItemSliding, IonLabel, IonList, IonModal, IonThumbnail } from "@ionic/react"
 import "./LoanContainer.css"
 import { useEffect, useState } from "react"
 
@@ -6,24 +6,25 @@ function LoanContainer() {
   const [loans, setLoans] = useState([
     {
       id: '1',
-      name: 'Pedro Gomez',
+      name: 'Johan Rios',
       nameInitials: '',
+      avatarClass: '',
       amount: 2500
     },
     {
       id: '2',
-      name: 'Andrea Perez',
+      name: 'Joon Erira',
       nameInitials: '',
       amount: 1000
     },
     {
       id: '3',
-      name: 'Ricardo',
+      name: 'Xosed Peñaloza',
       nameInitials: '',
       amount: 1000
     }
   ]);
-  const [labelColor, setLabelColor] = useState('danger');
+  const [labelColor, setLabelColor] = useState('success');
 
   const handleLabelColor = () => {
     if (labelColor === 'danger') {
@@ -65,21 +66,20 @@ function LoanContainer() {
     }));
   };
 
-
   // Inicializar iniciales de nombre para el avatar
   useEffect(() => {
+    const getGradient = () => {
+      return 'gradient-' + Math.floor(Math.random() * 6);
+    };
+
     setLoans(loans.map(loan => {
       if (loan.name.split(' ').length >= 2) {
-        return { ...loan, nameInitials: loan.name.split(' ')[0][0].toUpperCase() + loan.name.split(' ')[1][0].toUpperCase() };
-      }else{
-        return { ...loan, nameInitials: loan.name.substring(0, 2).toUpperCase() };
+        return { ...loan, avatarClass: getGradient(), nameInitials: loan.name.split(' ')[0][0].toUpperCase() + loan.name.split(' ')[1][0].toUpperCase() };
+      } else {
+        return { ...loan, avatarClass: getGradient(), nameInitials: loan.name.substring(0, 2).toUpperCase() };
       }
     }));
-  });
-
-  const getGradient = () => {
-    return 'gradient-' + Math.floor(Math.random() * 6)
-  }
+  }, []);
 
   return (
     <>
@@ -94,7 +94,7 @@ function LoanContainer() {
             </IonItemOptions>
 
             <IonItem>
-              <IonAvatar aria-hidden="true" slot="start" className={getGradient()}>
+              <IonAvatar aria-hidden="true" slot="start" className={loan.avatarClass}>
                 <p>{loan.nameInitials}</p>
               </IonAvatar>
               <IonLabel className="custom-label">
@@ -102,7 +102,7 @@ function LoanContainer() {
                   <p>{loan.name}</p>
                   <p className={labelColor}>{loan.amount}</p>
                 </div>
-              </IonLabel>
+                </IonLabel>
             </IonItem>
 
             {/* Opciones al final del item */}
