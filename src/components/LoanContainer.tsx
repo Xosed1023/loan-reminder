@@ -1,39 +1,85 @@
 import { IonAvatar, IonItem, IonItemOption, IonItemOptions, IonItemSliding, IonLabel, IonList, IonThumbnail } from "@ionic/react"
 import "./LoanContainer.css"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 function LoanContainer() {
   const [loans, setLoans] = useState([
     {
       id: '1',
-      artwork: 'https://ionicframework.com/docs/img/demos/avatar.svg',
-      title: 'test',
-      artist: 'artist',
-      year: '2000',
+      name: 'Pedro Gomez',
+      nameInitials: '',
+      amount: 2500
     },
     {
       id: '2',
-      artwork: 'https://ionicframework.com/docs/img/demos/avatar.svg',
-      title: 'test',
-      artist: 'artist',
-      year: '2000',
+      name: 'Andrea Perez',
+      nameInitials: '',
+      amount: 1000
     },
     {
       id: '3',
-      artwork: 'https://ionicframework.com/docs/img/demos/avatar.svg',
-      title: 'test',
-      artist: 'artist',
-      year: '2000',
-    },
-    {
-      id: '4',
-      artwork: 'https://ionicframework.com/docs/img/demos/avatar.svg',
-      title: 'test',
-      artist: 'artist',
-      year: '2000',
-    },
+      name: 'Ricardo',
+      nameInitials: '',
+      amount: 1000
+    }
   ]);
   const [labelColor, setLabelColor] = useState('danger');
+
+  const handleLabelColor = () => {
+    if (labelColor === 'danger') {
+      setLabelColor('success');
+    } else {
+      setLabelColor('danger');
+    }
+  };
+
+  const handleAddLoan = () => {
+    const newLoan = {
+      id: '5',
+      name: '',
+      nameInitials: '',
+      amount: 3000
+    };
+    setLoans([...loans, newLoan]);
+  };
+
+  const handleDeleteLoan = (id: string) => {
+    setLoans(loans.filter(loan => loan.id !== id));
+  };
+
+  const handleEditLoan = (id: string) => {
+    setLoans(loans.map(loan => {
+      if (loan.id === id) {
+        return { ...loan, title: 'edited' };
+      }
+      return loan;
+    }));
+  };
+
+  const handlePayLoan = (id: string) => {
+    setLoans(loans.map(loan => {
+      if (loan.id === id) {
+        return { ...loan, title: 'payed' };
+      }
+      return loan;
+    }));
+  };
+
+
+  // Inicializar iniciales de nombre para el avatar
+  useEffect(() => {
+    setLoans(loans.map(loan => {
+      if (loan.name.split(' ').length >= 2) {
+        return { ...loan, nameInitials: loan.name.split(' ')[0][0].toUpperCase() + loan.name.split(' ')[1][0].toUpperCase() };
+      }else{
+        return { ...loan, nameInitials: loan.name.substring(0, 2).toUpperCase() };
+      }
+    }));
+  });
+
+  const getGradient = () => {
+    return 'gradient-' + Math.floor(Math.random() * 6)
+  }
 
   return (
     <>
@@ -48,13 +94,13 @@ function LoanContainer() {
             </IonItemOptions>
 
             <IonItem>
-              <IonAvatar aria-hidden="true" slot="start">
-                <img alt="avatar" src="https://ionicframework.com/docs/img/demos/avatar.svg" />
+              <IonAvatar aria-hidden="true" slot="start" className={getGradient()}>
+                <p>{loan.nameInitials}</p>
               </IonAvatar>
               <IonLabel className="custom-label">
                 <div className="label-content">
-                  <p>{loan.title}</p>
-                  <p className={labelColor}>{loan.artist}</p>
+                  <p>{loan.name}</p>
+                  <p className={labelColor}>{loan.amount}</p>
                 </div>
               </IonLabel>
             </IonItem>
