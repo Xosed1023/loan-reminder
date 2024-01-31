@@ -31,11 +31,17 @@ function ActionButton({ setLoans, loans }: any) {
     modal.current?.dismiss(formData, 'confirm');
   }
 
+  function generateUniqueId() {
+    const timestamp = new Date().getTime();
+    const random = Math.random().toString(36).substring(2, 10);
+    return `${timestamp}-${random}`;
+  }
+
   function onWillDismiss(ev: CustomEvent<OverlayEventDetail>) {
     if (ev.detail.role === 'confirm') {
       setLoans([
         ...loans, {
-          id: '1',
+          id: generateUniqueId(),
           name: ev.detail.data.debtor,
           amount: ev.detail.data.amount
         }

@@ -69,7 +69,7 @@ function LoanContainer({loans, setLoans}: any) {
               {/* Opciones al final del item */}
               <IonItemOptions side="end" >
                 <IonItemOption mode="ios">Registrar Pago</IonItemOption>
-                <IonItemOption mode="ios" color="danger">Eliminar</IonItemOption>
+                <IonItemOption mode="ios" color="danger" onClick={() => handleDeleteLoan(loan.id)}>Eliminar</IonItemOption>
               </IonItemOptions>
             </IonItemSliding>
           )}

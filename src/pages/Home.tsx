@@ -1,14 +1,40 @@
-import { IonApp, IonContent, IonHeader, IonIcon, IonLabel, IonPage, IonRouterOutlet, IonTabBar, IonTabButton, IonTabs, IonTitle, IonToolbar } from '@ionic/react';
+import { IonApp, IonIcon, IonLabel, IonPage, IonRouterOutlet, IonTabBar, IonTabButton, IonTabs } from '@ionic/react';
+import { IonReactRouter } from '@ionic/react-router';
+import { Storage } from '@ionic/storage';
+import { ellipse, square, triangle } from 'ionicons/icons';
+import { Redirect, Route } from 'react-router';
 import './Splash.css';
-import { triangle, ellipse, square } from 'ionicons/icons';
-import { Route, Redirect } from 'react-router';
-import Splash from './Splash';
 import Tab1 from './Tab1';
 import Tab2 from './Tab2';
 import Tab3 from './Tab3';
-import { IonReactRouter } from '@ionic/react-router';
+import { useState, useEffect } from 'react';
 
 const Home: React.FC = () => {
+  const [loans, setLoans] = useState([]);
+  const storage: any = new Storage();
+
+  useEffect(() => {
+    const fetchLoans = async () => {
+      await storage.create();
+      let data = await storage.get('loans');
+      if (data) {
+        setLoans(data);
+      } else {
+        setLoans([])
+      }
+    };
+    fetchLoans();
+  }, []);
+
+  useEffect(() => {
+    const saveLoans = async () => {
+      await storage.create();
+      storage.set('loans', loans);
+    }
+
+    saveLoans();
+  }, [loans]);
+
   return (
     <IonPage>
       <IonApp>
@@ -16,7 +42,7 @@ const Home: React.FC = () => {
           <IonTabs>
             <IonRouterOutlet>
               <Route exact path="/tab1">
-                <Tab1 />
+                <Tab1 loans={loans} setLoans={setLoans} />
               </Route>
               <Route exact path="/tab2">
                 <Tab2 />
