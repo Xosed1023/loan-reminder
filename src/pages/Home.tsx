@@ -8,9 +8,11 @@ import Tab1 from './Tab1';
 import Tab2 from './Tab2';
 import Tab3 from './Tab3';
 import { useState, useEffect } from 'react';
+import { Loan } from '../models/Loan';
+import React from 'react';
 
 const Home: React.FC = () => {
-  const [loans, setLoans] = useState([]);
+  const [loans, setLoans] = React.useState<Loan[]>([]);
   const storage: any = new Storage();
 
   useEffect(() => {
@@ -31,7 +33,6 @@ const Home: React.FC = () => {
       await storage.create();
       storage.set('loans', loans);
     }
-
     saveLoans();
   }, [loans]);
 

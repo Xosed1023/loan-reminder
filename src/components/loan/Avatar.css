@@ -3,8 +3,8 @@ ion-avatar {
     justify-content: center !important;
     align-items: center !important;
     font-weight: bold !important;
+    color: white;
 }
-
 
 /* Avatar gradients */
 .gradient-0 {

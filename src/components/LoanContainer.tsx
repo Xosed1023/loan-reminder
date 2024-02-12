@@ -1,33 +1,37 @@
-import { IonAvatar, IonCard, IonItem, IonItemOption, IonItemOptions, IonItemSliding, IonLabel, IonList, IonModal, IonSearchbar, IonThumbnail } from "@ionic/react"
-import "./LoanContainer.css"
-import { useEffect, useState } from "react"
-import Avatar from "./loan/Avatar";
+import { IonCard, IonItem, IonItemOption, IonItemOptions, IonItemSliding, IonLabel, IonList, IonSearchbar } from "@ionic/react";
+import { Loan } from "../models/Loan";
+import "./LoanContainer.css";
 import Amount from "./loan/Amount";
+import Avatar from "./loan/Avatar";
+import Modal from "./shared/Modal";
+import { useState } from "react";
 
-function LoanContainer({loans, setLoans}: any) {
-  
+function LoanContainer({ loans, setLoans, openModal }: any) {
+  const [isOpen, setIsOpen] = useState(false);
 
   const handleAddLoan = () => {
-    const newLoan = {
+    const newLoan: Loan = {
       id: '5',
       name: '',
       nameInitials: '',
-      amount: 3000
+      amount: 3000,
+      interestRate: 0,
+      payDate: new Date().toISOString().split('T')[0],
     };
     setLoans([...loans, newLoan]);
   };
 
-  const handleDeleteLoan = (id: string) => {
-    setLoans(loans.filter((loan: any) => loan.id !== id));
-  };
-
   const handleEditLoan = (id: string) => {
-    setLoans(loans.map((loan: any) => {
+    setLoans(loans.map((loan: Loan) => {
       if (loan.id === id) {
         return { ...loan, title: 'edited' };
       }
       return loan;
     }));
+  };
+
+  const handleDeleteLoan = (id: string) => {
+    setLoans(loans.filter((loan: any) => loan.id !== id));
   };
 
   const handlePayLoan = (id: string) => {
@@ -39,27 +43,29 @@ function LoanContainer({loans, setLoans}: any) {
     }));
   };
 
+
+
   return (
     <>
-      <h1>Tus prestamos</h1>
+      <h1 className="ion-text-primary">Tus prestamos</h1>
       <IonCard className="ion-no-margin ion-margin-bottom">
         {
           loans.length >= 10 &&
           <IonSearchbar placeholder="Search"></IonSearchbar>
         }
-        <IonList mode="ios">
+        <IonList mode="ios" lines="none">
 
           {loans.map((loan: any) =>
             <IonItemSliding key={loan.id}>
               {/* Opciones al incio del item */}
               <IonItemOptions side="start" >
-                <IonItemOption mode="ios" color="success">Editar</IonItemOption>
+                <IonItemOption mode="ios" color="success" onClick={() => openModal(loan.id)}>Editar</IonItemOption>
               </IonItemOptions>
 
               <IonItem>
                 <Avatar loan={loan}></Avatar>
                 <IonLabel className="custom-label">
-                  <div className="label-content">
+                  <div className="label-content ion-text-capitalize">
                     <p>{loan.name}</p>
                     <Amount amount={loan.amount}></Amount>
                   </div>
@@ -75,6 +81,8 @@ function LoanContainer({loans, setLoans}: any) {
           )}
         </IonList>
       </IonCard>
+
+      
     </>
   )
 }

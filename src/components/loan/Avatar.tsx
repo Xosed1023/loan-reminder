@@ -12,10 +12,11 @@ interface AvatarProps {
 }
 
 const Avatar: React.FC<AvatarProps> = ({ loan }) => {
-  const [nameInitials, setNameInitials] = useState<string>('');
-  const [avatarClass, setAvatarClass] = useState<string>('');
+  const [nameInitials, setNameInitials] = useState('');
+  const [avatarClass, setAvatarClass] = useState('');
 
   useEffect(() => {
+    console.log(">>> | loan.name:", loan)
     const wordsName = loan.name.split(' ');
     let initials = '';
     if (wordsName.length > 1) {
