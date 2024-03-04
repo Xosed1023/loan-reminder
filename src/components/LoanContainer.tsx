@@ -1,9 +1,10 @@
-import { IonCard, IonItem, IonItemOption, IonItemOptions, IonItemSliding, IonLabel, IonList, IonSearchbar } from "@ionic/react";
+import { IonCard, IonItem, IonItemOption, IonItemOptions, IonItemSliding, IonLabel, IonList, IonSearchbar, IonSelect, IonSelectOption } from "@ionic/react";
 import { Loan } from "../models/Loan";
 import "./LoanContainer.css";
 import Amount from "./loan/Amount";
 import Avatar from "./loan/Avatar";
 import Modal from "./shared/Modal";
+import { add, remove, filterOutline } from 'ionicons/icons';
 import { useState } from "react";
 
 function LoanContainer({ loans, setLoans, openModal }: any) {
@@ -50,8 +51,20 @@ function LoanContainer({ loans, setLoans, openModal }: any) {
       <h1 className="ion-text-primary">Tus prestamos</h1>
       <IonCard className="ion-no-margin ion-margin-bottom">
         {
-          loans.length >= 10 &&
-          <IonSearchbar placeholder="Search"></IonSearchbar>
+          loans.length >= 4 &&
+          <>
+            <IonSearchbar placeholder="Search"></IonSearchbar>
+            <IonItem>
+              <IonSelect
+                interface="popover"
+                toggleIcon={filterOutline}
+                placeholder="Ordernar">
+                <IonSelectOption value="paid">Pagado</IonSelectOption>
+                <IonSelectOption value="delayed">Retrasado</IonSelectOption>
+                <IonSelectOption value="ontime">A tiempo</IonSelectOption>
+              </IonSelect>
+            </IonItem>
+          </>
         }
         <IonList mode="ios" lines="none">
 
@@ -82,7 +95,7 @@ function LoanContainer({ loans, setLoans, openModal }: any) {
         </IonList>
       </IonCard>
 
-      
+
     </>
   )
 }

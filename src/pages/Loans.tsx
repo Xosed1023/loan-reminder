@@ -3,7 +3,7 @@ import { IonContent, IonPage } from '@ionic/react';
 import ActionButton from '../components/ActionButton';
 import LoanContainer from '../components/LoanContainer';
 import NoRecords from '../components/NoRecords';
-import './Tab1.css';
+import './Loans.css';
 import { Loan } from '../models/Loan';
 import { useState } from 'react';
 import Modal from '../components/shared/Modal';
@@ -13,7 +13,7 @@ interface LoansProps {
   setLoans: any
 }
 
-const Tab1: React.FC<LoansProps> = ({ loans, setLoans }) => {
+const Loans: React.FC<LoansProps> = ({ loans, setLoans }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editableLoan, setEditableLoan] = useState({} as Loan | undefined);
   // Función para abrir el modal
@@ -48,4 +48,4 @@ const Tab1: React.FC<LoansProps> = ({ loans, setLoans }) => {
   );
 };
 
-export default Tab1;
+export default Loans;

@@ -4,7 +4,7 @@ import { Storage } from '@ionic/storage';
 import { ellipse, square, triangle } from 'ionicons/icons';
 import { Redirect, Route } from 'react-router';
 import './Splash.css';
-import Tab1 from './Tab1';
+import Loans from './Loans';
 import Tab2 from './Tab2';
 import Tab3 from './Tab3';
 import { useState, useEffect } from 'react';
@@ -42,8 +42,8 @@ const Home: React.FC = () => {
         <IonReactRouter>
           <IonTabs>
             <IonRouterOutlet>
-              <Route exact path="/tab1">
-                <Tab1 loans={loans} setLoans={setLoans} />
+              <Route exact path="/loans">
+                <Loans loans={loans} setLoans={setLoans} />
               </Route>
               <Route exact path="/tab2">
                 <Tab2 />
@@ -52,13 +52,13 @@ const Home: React.FC = () => {
                 <Tab3 />
               </Route>
               <Route exact path="/home">
-                <Redirect to="/tab1" />
+                <Redirect to="/loans" />
               </Route>
             </IonRouterOutlet>
             <IonTabBar slot="bottom">
-              <IonTabButton tab="tab1" href="/tab1">
+              <IonTabButton tab="loans" href="/loans">
                 <IonIcon aria-hidden="true" icon={triangle} />
-                <IonLabel>Tab 1</IonLabel>
+                <IonLabel>Préstamos</IonLabel>
               </IonTabButton>
               <IonTabButton tab="tab2" href="/tab2">
                 <IonIcon aria-hidden="true" icon={ellipse} />
