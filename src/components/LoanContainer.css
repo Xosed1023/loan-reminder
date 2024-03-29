@@ -44,3 +44,11 @@ ion-item {
 .danger {
   color: var(--ion-color-danger);
 }
+
+ion-select::part(label), ion-select::part(placeholder), ion-select::part(text){
+  display: none;
+}
+
+ion-select::part(icon){
+ scale: 1;
+}
