@@ -44,6 +44,23 @@ function LoanContainer({ loans, setLoans, openModal }: any) {
     }));
   };
 
+  const handleSort = (ev: any) => {
+    const sortCriteria = ev.detail.value;
+    if(sortCriteria === 'paid') {
+      
+    }else if(sortCriteria === 'ontime') {
+      
+    } else if(sortCriteria === 'delayed') {
+      
+    }
+    const sortedLoans = [...loans].sort((a: Loan, b: Loan) => {
+      const dateA = new Date(a.payDate);
+      const dateB = new Date(b.payDate);
+      return dateA.getTime() - dateB.getTime();
+    });
+    setLoans(sortedLoans);
+  }
+
 
 
   return (
@@ -52,45 +69,25 @@ function LoanContainer({ loans, setLoans, openModal }: any) {
       <IonCard className="ion-no-margin ion-margin-bottom">
         {
           loans.length >= 4 &&
-          
-            <IonGrid >
-              <IonRow >
-                <IonCol size="10">
-                  <IonSearchbar placeholder="Search"></IonSearchbar>
-                </IonCol>
-                <IonCol pull="1" style={{ display: 'flex', alignItems: 'center', marginRight: '-5%' }}>
-                  <IonSelect
-                    label="Text"
-                    justify="end"
-                    interface="popover"
-                    toggleIcon={filterOutline}>
-                    <IonSelectOption value="paid">Pagado</IonSelectOption>
-                    <IonSelectOption value="delayed">Retrasado</IonSelectOption>
-                    <IonSelectOption value="ontime">A tiempo</IonSelectOption>
-                  </IonSelect>
-                </IonCol>
-              </IonRow>
-              {/* <IonItem>
-              
-              
-              </IonItem>
-              <IonItem style={{ display: 'flex', justifyContent: 'end', width: '65px', marginRight: '-20px' }}>
+          <IonGrid >
+            <IonRow >
+              <IonCol size="10">
+                <IonSearchbar placeholder="Search"></IonSearchbar>
+              </IonCol>
+              <IonCol pull="1" className="col-filter">
                 <IonSelect
                   label="Text"
                   justify="end"
                   interface="popover"
-                  toggleIcon={filterOutline}>
+                  toggleIcon={filterOutline}
+                  onIonChange={handleSort}>
                   <IonSelectOption value="paid">Pagado</IonSelectOption>
                   <IonSelectOption value="delayed">Retrasado</IonSelectOption>
                   <IonSelectOption value="ontime">A tiempo</IonSelectOption>
                 </IonSelect>
-              </IonItem> */}
-            </IonGrid>
-
-
-
-
-          
+              </IonCol>
+            </IonRow>
+          </IonGrid>
         }
         <IonList mode="ios" lines="none">
 
@@ -106,6 +103,7 @@ function LoanContainer({ loans, setLoans, openModal }: any) {
                 <IonLabel className="custom-label">
                   <div className="label-content ion-text-capitalize">
                     <p>{loan.name}</p>
+                    <p>{loan.payDate}</p>
                     <Amount amount={loan.amount}></Amount>
                   </div>
                 </IonLabel>

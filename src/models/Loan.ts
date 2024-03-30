@@ -4,5 +4,6 @@ export interface Loan {
   amount: number,
   interestRate: number,
   payDate: string,
+  isPayed?: boolean,
   nameInitials?: string,
 }

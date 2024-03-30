@@ -52,3 +52,9 @@ ion-select::part(label), ion-select::part(placeholder), ion-select::part(text){
 ion-select::part(icon){
  scale: 1;
 }
+
+.col-filter{
+  display: flex; 
+  align-items: center;
+  margin-right: -5%;
+}
