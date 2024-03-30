@@ -24,7 +24,6 @@ const Loans: React.FC<LoansProps> = ({ loans, setLoans }) => {
 
   // Función para cerrar el modal
   const closeModal = () => {
-    console.log('cerrar modal')
     setIsModalOpen(false);
   };
 

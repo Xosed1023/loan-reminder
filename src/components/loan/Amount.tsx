@@ -1,16 +1,20 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { transformNumbers } from "../../utilities/transform";
 
 interface AmountProps {
   amount: number;
+  color: string;
 }
 
-const Amount: React.FC<AmountProps> = ({ amount }) => {
-  const [labelColor, setLabelColor] = useState('success');
+const Amount: React.FC<AmountProps> = ({ amount, color }) => {
+  /* success -> a tiempo
+  danger -> vencidos
+  warning -> proximoss
+  gris -> pago */
 
   return (
     <>
-      <p className={labelColor}>${transformNumbers(amount)}</p>
+      <p className={color}>${transformNumbers(amount)}</p>
     </>
   )
 }

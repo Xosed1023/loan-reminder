@@ -20,6 +20,7 @@ const Home: React.FC = () => {
       await storage.create();
       let data = await storage.get('loans');
       if (data) {
+        sortLoans(data);
         setLoans(data);
       } else {
         setLoans([])
@@ -27,6 +28,18 @@ const Home: React.FC = () => {
     };
     fetchLoans();
   }, []);
+
+  const sortLoans = (loans: Loan[]) => {
+    loans.sort((a, b) => {
+      if (a.payDate < b.payDate) {
+        return -1;
+      }
+      if (a.payDate > b.payDate) {
+        return 1;
+      }
+      return 0;
+    });
+  }
 
   useEffect(() => {
     const saveLoans = async () => {

@@ -1,11 +1,10 @@
 import { IonCard, IonCol, IonGrid, IonItem, IonItemOption, IonItemOptions, IonItemSliding, IonLabel, IonList, IonRow, IonSearchbar, IonSelect, IonSelectOption } from "@ionic/react";
+import { filterOutline } from 'ionicons/icons';
+import { useState } from "react";
 import { Loan } from "../models/Loan";
 import "./LoanContainer.css";
 import Amount from "./loan/Amount";
 import Avatar from "./loan/Avatar";
-import Modal from "./shared/Modal";
-import { add, remove, filterOutline } from 'ionicons/icons';
-import { useState } from "react";
 
 function LoanContainer({ loans, setLoans, openModal }: any) {
   const [isOpen, setIsOpen] = useState(false);
@@ -46,20 +45,32 @@ function LoanContainer({ loans, setLoans, openModal }: any) {
 
   const handleSort = (ev: any) => {
     const sortCriteria = ev.detail.value;
-    if(sortCriteria === 'paid') {
-      
-    }else if(sortCriteria === 'ontime') {
-      
-    } else if(sortCriteria === 'delayed') {
-      
+    if (sortCriteria === 'paid') {
+      setLoans(loans.filter((loan: Loan) => loan.isPayed === true));
+    } else if (sortCriteria === 'ontime') {
+      /* setLoans(loans.filter((loan: Loan) => loan.id !== id)); */
+    } else if (sortCriteria === 'delayed') {
+      /* setLoans(loans.filter((loan: Loan) => loan.id !== id)); */
     }
-    const sortedLoans = [...loans].sort((a: Loan, b: Loan) => {
-      const dateA = new Date(a.payDate);
-      const dateB = new Date(b.payDate);
-      return dateA.getTime() - dateB.getTime();
-    });
-    setLoans(sortedLoans);
   }
+
+  const getColor = (loan: Loan) => {
+    if (loan.id === '1711761608398-o571sqlb') {
+      loan.payDate = '2024-12-31'
+    }
+    const currentDate = Date.now(); // Obtener la fecha y hora actual en la zona horaria local del dispositivo
+    const daysUntilPay = Math.ceil((new Date(loan.payDate).getTime() - currentDate) / (1000 * 60 * 60 * 24));
+
+    if (loan.isPayed) {
+      return 'grey';
+    } else if (daysUntilPay <= -0.1) {
+      return 'danger';
+    } else if (daysUntilPay <= 5) {
+      return 'warning';
+    } else {
+      return 'success';
+    }
+  };
 
 
 
@@ -104,7 +115,7 @@ function LoanContainer({ loans, setLoans, openModal }: any) {
                   <div className="label-content ion-text-capitalize">
                     <p>{loan.name}</p>
                     <p>{loan.payDate}</p>
-                    <Amount amount={loan.amount}></Amount>
+                    <Amount amount={loan.amount} color={getColor(loan)}></Amount>
                   </div>
                 </IonLabel>
               </IonItem>
