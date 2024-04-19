@@ -3,13 +3,22 @@ import { OverlayEventDetail } from "@ionic/react/dist/types/components/react-com
 import { useRef, useState } from "react";
 import { generateUniqueId, replaceAll, transformNumbers } from "../../utilities/transform";
 import { Loan } from "../../models/Loan";
+import { IndexedDBService } from "../../persistence/IndexedDBService";
 
-const Modal = ({ setLoans, isOpen, closeModal, editableLoan }: any) => {
+interface ModalProps {
+  setLoans: () => void;
+  isOpen: boolean;
+  closeModal: () => void;
+  editableLoan: Loan | undefined;
+  indexedDBService: IndexedDBService;
+}
+
+const Modal = ({ setLoans, isOpen, closeModal, editableLoan, indexedDBService }: ModalProps) => {
 
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString());
-  const [amount, setAmount] = useState('');
-  const [debtor, setDebtor] = useState('');
-  const [interest, setInterest] = useState('');
+  const [amount, setAmount] = useState<string | number>();
+  const [debtor, setDebtor] = useState<string>();
+  const [interest, setInterest] = useState<string | number>();
 
   const modal = useRef<HTMLIonModalElement>(null);
   const form = {
@@ -19,18 +28,17 @@ const Modal = ({ setLoans, isOpen, closeModal, editableLoan }: any) => {
   };
 
   function onWillDismiss(ev: CustomEvent<OverlayEventDetail>) {
-    console.log(ev.detail.data);
     if (ev.detail.role === 'confirm') {
-      setLoans((prevState: Loan[]) => [
-        ...prevState,
-        {
-          id: generateUniqueId(),
-          name: ev.detail.data.debtor,
-          amount: replaceAll(ev.detail.data.amount, '.', ''),
-          interestRate: ev.detail.data.interest,
-          payDate: selectedDate
-        }
-      ]);
+      indexedDBService.addLoan({
+        id: generateUniqueId(),
+        name: ev.detail.data.debtor,
+        amount: Number(replaceAll(ev.detail.data.amount, '.', '')),
+        interestRate: ev.detail.data.interest,
+        payDate: selectedDate
+      });
+      /* setLoans((prevState: Loan[]) => [
+        ...prevState
+      ]); */
 
     }
     setAmount('');

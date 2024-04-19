@@ -1,8 +1,13 @@
 import { IonFab, IonFabButton, IonIcon } from '@ionic/react';
 import { add } from 'ionicons/icons';
 import './ActionButton.css';
+import { IndexedDBService } from '../persistence/IndexedDBService';
 
-function ActionButton({ openModal }: any) {
+interface AddLoanButtonProps {
+  openModal: () => void;
+}
+
+function ActionButton({ openModal }: AddLoanButtonProps) {
   return (
     <>
       <IonFab slot="fixed" vertical="bottom" horizontal="end">

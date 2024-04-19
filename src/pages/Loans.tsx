@@ -7,6 +7,7 @@ import './Loans.css';
 import { Loan } from '../models/Loan';
 import { useState } from 'react';
 import Modal from '../components/shared/Modal';
+import { IndexedDBService } from '../persistence/IndexedDBService';
 
 interface LoansProps {
   loans: Loan[],
@@ -14,8 +15,11 @@ interface LoansProps {
 }
 
 const Loans: React.FC<LoansProps> = ({ loans, setLoans }) => {
+
+  const indexedDBService = new IndexedDBService('loanReminder', 1);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editableLoan, setEditableLoan] = useState({} as Loan | undefined);
+  
   // Función para abrir el modal
   const openModal = (loanId?: string) => {
     setEditableLoan(loans.find((loan: any) => loan.id === loanId));
@@ -42,7 +46,12 @@ const Loans: React.FC<LoansProps> = ({ loans, setLoans }) => {
         <ActionButton openModal={openModal} />
       </IonContent>
 
-      <Modal setLoans={setLoans} isOpen={isModalOpen} closeModal={closeModal} editableLoan={editableLoan}></Modal>
+      <Modal 
+      setLoans={setLoans} 
+      isOpen={isModalOpen} 
+      closeModal={closeModal} 
+      editableLoan={editableLoan}
+      indexedDBService={indexedDBService}></Modal>
     </IonPage>
   );
 };
