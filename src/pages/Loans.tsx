@@ -11,12 +11,12 @@ import { IndexedDBService } from '../persistence/IndexedDBService';
 
 interface LoansProps {
   loans: Loan[],
-  setLoans: any
+  setLoans: any,
+  indexedDBService: IndexedDBService
 }
 
-const Loans: React.FC<LoansProps> = ({ loans, setLoans }) => {
-
-  const indexedDBService = new IndexedDBService('loanReminder', 1);
+const Loans: React.FC<LoansProps> = ({ loans, setLoans, indexedDBService }) => {
+  
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editableLoan, setEditableLoan] = useState({} as Loan | undefined);
   

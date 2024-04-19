@@ -6,7 +6,7 @@ import { Loan } from "../../models/Loan";
 import { IndexedDBService } from "../../persistence/IndexedDBService";
 
 interface ModalProps {
-  setLoans: () => void;
+  setLoans: any;
   isOpen: boolean;
   closeModal: () => void;
   editableLoan: Loan | undefined;
@@ -17,7 +17,7 @@ const Modal = ({ setLoans, isOpen, closeModal, editableLoan, indexedDBService }:
 
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString());
   const [amount, setAmount] = useState<string | number>();
-  const [debtor, setDebtor] = useState<string>();
+  const [name, setName] = useState<string>();
   const [interest, setInterest] = useState<string | number>();
 
   const modal = useRef<HTMLIonModalElement>(null);
@@ -28,6 +28,8 @@ const Modal = ({ setLoans, isOpen, closeModal, editableLoan, indexedDBService }:
   };
 
   function onWillDismiss(ev: CustomEvent<OverlayEventDetail>) {
+
+    console.log('onWillDismiss', ev.detail.data);
     if (ev.detail.role === 'confirm') {
       indexedDBService.addLoan({
         id: generateUniqueId(),
@@ -35,14 +37,14 @@ const Modal = ({ setLoans, isOpen, closeModal, editableLoan, indexedDBService }:
         amount: Number(replaceAll(ev.detail.data.amount, '.', '')),
         interestRate: ev.detail.data.interest,
         payDate: selectedDate
+      }).then(() => {
+        indexedDBService.getAllLoans().then((data) => {
+          setLoans([...data]);
+        });
       });
-      /* setLoans((prevState: Loan[]) => [
-        ...prevState
-      ]); */
-
     }
     setAmount('');
-    setDebtor('');
+    setName('');
     setInterest('');
   }
 
@@ -69,12 +71,15 @@ const Modal = ({ setLoans, isOpen, closeModal, editableLoan, indexedDBService }:
     setSelectedDate(new Date(event.detail.value).toISOString().split('T')[0]);
   };
 
+  /**
+   * This function loads the data of the editable loan
+   * Is called when the modal is opened
+   */
   const loadData = () => {
-    console.log('Cargando data')
     if (editableLoan) {
-      console.log(">>> | editableLoan:", editableLoan)
+      console.log("Hay un prestamo editable", editableLoan);
       setAmount(editableLoan.amount);
-      setDebtor(editableLoan.name);
+      setName(editableLoan.name);
       setInterest(editableLoan.interestRate);
       setSelectedDate(editableLoan.payDate);
     }
@@ -97,13 +102,15 @@ const Modal = ({ setLoans, isOpen, closeModal, editableLoan, indexedDBService }:
           </IonToolbar>
         </IonHeader>
         <IonContent className="ion-padding">
-          <IonTitle className='ion-text-center ion-margin-bottom' color="primary">Nuevo prestamo</IonTitle>
+          {/* TODO : Add validation for new loan or edit loan */}
+          <IonTitle className='ion-text-center ion-margin-bottom' color="primary">
+            { editableLoan ? 'Editar Préstamo' : 'Nuevo Préstamo' }
+          </IonTitle>
           <IonItem>
             <IonInput
               label="Nombre del deudor"
               labelPlacement="stacked"
               ref={form.debtor}
-              /* value={debtor} */
               type="text"
               placeholder="Nombre"
             />

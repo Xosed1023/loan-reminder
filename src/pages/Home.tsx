@@ -10,23 +10,30 @@ import Tab3 from './Tab3';
 import { useState, useEffect } from 'react';
 import { Loan } from '../models/Loan';
 import React from 'react';
+import { IndexedDBService } from '../persistence/IndexedDBService';
 
 const Home: React.FC = () => {
   const [loans, setLoans] = React.useState<Loan[]>([]);
-  const storage: any = new Storage();
+  const db = IndexedDBService.getInstance();
+
+  const fetchLoans = async (desde: string = "No identificado") => {
+    console.log("fetchLoans desde: ", desde);
+    db.getAllLoans().then(loans => {
+      sortLoans(loans);
+      setLoans(loans)
+    }).catch(error => {
+      console.error(`Error consultando prestamo ${error}`);
+      setLoans([])
+    });
+  };
 
   useEffect(() => {
-    const fetchLoans = async () => {
-      await storage.create();
-      let data = await storage.get('loans');
-      if (data) {
-        sortLoans(data);
-        setLoans(data);
-      } else {
-        setLoans([])
-      }
-    };
-    fetchLoans();
+    db.openDatabase().then(() => {
+      fetchLoans("Effect de inicio");
+    }).catch(error => {
+      console.error(`Error al abrir la base de datos ${error}`);
+      setLoans([])
+    });
   }, []);
 
   const sortLoans = (loans: Loan[]) => {
@@ -42,13 +49,8 @@ const Home: React.FC = () => {
   }
 
   useEffect(() => {
-    const saveLoans = async () => {
-      await storage.create();
-      storage.set('loans', loans);
-    }
-    saveLoans();
+    //fetchLoans();
   }, [loans]);
-
   return (
     <IonPage>
       <IonApp>
@@ -56,7 +58,7 @@ const Home: React.FC = () => {
           <IonTabs>
             <IonRouterOutlet>
               <Route exact path="/loans">
-                <Loans loans={loans} setLoans={setLoans} />
+                <Loans loans={loans} setLoans={setLoans} indexedDBService={db} />
               </Route>
               <Route exact path="/tab2">
                 <Tab2 />

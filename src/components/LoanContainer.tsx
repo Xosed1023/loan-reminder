@@ -5,6 +5,7 @@ import { Loan } from "../models/Loan";
 import "./LoanContainer.css";
 import Amount from "./loan/Amount";
 import Avatar from "./loan/Avatar";
+import { IndexedDBService } from "../persistence/IndexedDBService";
 
 function LoanContainer({ loans, setLoans, openModal }: any) {
   const [isOpen, setIsOpen] = useState(false);
@@ -31,7 +32,11 @@ function LoanContainer({ loans, setLoans, openModal }: any) {
   };
 
   const handleDeleteLoan = (id: string) => {
-    setLoans(loans.filter((loan: any) => loan.id !== id));
+    const db = IndexedDBService.getInstance();
+    db.deleteLoan(id).then(() => {
+      setLoans(loans.filter((loan: any) => loan.id !== id));
+    });
+
   };
 
   const handlePayLoan = (id: string) => {
