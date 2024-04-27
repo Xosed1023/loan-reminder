@@ -24,6 +24,12 @@ export class IndexedDBService {
     return IndexedDBService.instance;
   }
 
+  /**
+   * Opens a connection to the IndexedDB database.
+   *
+   * @return {Promise<void>} A promise that resolves when the database is successfully opened,
+   *                         or rejects if there is an error opening the database.
+   */
   public async openDatabase(): Promise<void> {
     return new Promise((resolve, reject) => {
       const request = window.indexedDB.open(this.dbName, this.dbVersion);
@@ -49,6 +55,12 @@ export class IndexedDBService {
     });
   }
 
+  /**
+   * Adds a new loan to the database.
+   *
+   * @param {Loan} loan - The loan object to be added
+   * @return {Promise<void>} A promise that resolves when the loan is successfully added
+   */
   public async addLoan(loan: Loan): Promise<void> {
     if (!this.db) {
       throw new Error('La base de datos no está abierta');
@@ -72,6 +84,11 @@ export class IndexedDBService {
     });
   }
 
+  /**
+   * Retrieves all loans from the database.
+   *
+   * @return {Promise<Loan[]>} A promise that resolves with an array of loans
+   */
   public async getAllLoans(): Promise<Loan[]> {
     if (!this.db) {
       throw new Error('La base de datos no está abierta');

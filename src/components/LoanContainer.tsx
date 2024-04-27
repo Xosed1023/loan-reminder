@@ -22,15 +22,6 @@ function LoanContainer({ loans, setLoans, openModal }: any) {
     setLoans([...loans, newLoan]);
   };
 
-  const handleEditLoan = (id: string) => {
-    setLoans(loans.map((loan: Loan) => {
-      if (loan.id === id) {
-        return { ...loan, title: 'edited' };
-      }
-      return loan;
-    }));
-  };
-
   const handleDeleteLoan = (id: string) => {
     const db = IndexedDBService.getInstance();
     db.deleteLoan(id).then(() => {

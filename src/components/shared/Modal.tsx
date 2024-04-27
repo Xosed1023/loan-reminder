@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { generateUniqueId, replaceAll, transformNumbers } from "../../utilities/transform";
 import { Loan } from "../../models/Loan";
 import { IndexedDBService } from "../../persistence/IndexedDBService";
+import { useForm } from "react-hook-form";
 
 interface ModalProps {
   setLoans: any;
@@ -21,6 +22,8 @@ const Modal = ({ setLoans, isOpen, closeModal, editableLoan, indexedDBService }:
   const [interest, setInterest] = useState<string | number>();
 
   const modal = useRef<HTMLIonModalElement>(null);
+  const { register, handleSubmit, formState: { errors }, } = useForm();
+
   const form = {
     amount: useRef<HTMLIonInputElement>(null),
     debtor: useRef<HTMLIonInputElement>(null),
@@ -28,8 +31,6 @@ const Modal = ({ setLoans, isOpen, closeModal, editableLoan, indexedDBService }:
   };
 
   function onWillDismiss(ev: CustomEvent<OverlayEventDetail>) {
-
-    console.log('onWillDismiss', ev.detail.data);
     if (ev.detail.role === 'confirm') {
       indexedDBService.addLoan({
         id: generateUniqueId(),
@@ -77,13 +78,18 @@ const Modal = ({ setLoans, isOpen, closeModal, editableLoan, indexedDBService }:
    */
   const loadData = () => {
     if (editableLoan) {
-      console.log("Hay un prestamo editable", editableLoan);
       setAmount(editableLoan.amount);
       setName(editableLoan.name);
       setInterest(editableLoan.interestRate);
       setSelectedDate(editableLoan.payDate);
     }
   }
+
+  const onSubmit = (data: any) => {
+    console.log("onSubmit", data);
+  }
+
+
 
   return (
     <>
@@ -102,54 +108,62 @@ const Modal = ({ setLoans, isOpen, closeModal, editableLoan, indexedDBService }:
           </IonToolbar>
         </IonHeader>
         <IonContent className="ion-padding">
-          {/* TODO : Add validation for new loan or edit loan */}
           <IonTitle className='ion-text-center ion-margin-bottom' color="primary">
-            { editableLoan ? 'Editar Préstamo' : 'Nuevo Préstamo' }
+            {editableLoan ? 'Editar Préstamo' : 'Nuevo Préstamo'}
           </IonTitle>
-          <IonItem>
-            <IonInput
-              label="Nombre del deudor"
-              labelPlacement="stacked"
-              ref={form.debtor}
-              type="text"
-              placeholder="Nombre"
-            />
-          </IonItem>
-          <IonItem>
-            <IonInput
-              label="Cantidad a prestar"
-              labelPlacement="stacked"
-              ref={form.amount}
-              value={amount}
-              type="text"
-              placeholder="Monto"
-              onIonInput={handleAmountChange}
-            />
-          </IonItem>
-          <IonItem>
-            <IonInput
-              label="Tasa de interés?"
-              labelPlacement="stacked"
-              ref={form.interest}
-              value={interest}
-              type="number"
-              placeholder="Porcentaje"
-            />
-          </IonItem>
-          <IonItem>
-            <IonLabel>Fecha de pago</IonLabel>
-            <IonDatetimeButton datetime="datetime" mode='ios'></IonDatetimeButton>
 
-            <IonModal keepContentsMounted={true}>
-              <IonDatetime
-                presentation='date'
-                id="datetime"
-                showDefaultButtons={true}
-                min={new Date().toISOString()}
-                onIonChange={handleDateChange}
-                value={selectedDate}></IonDatetime>
-            </IonModal>
-          </IonItem>
+
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <IonItem>
+              <IonInput
+                label="Nombre del deudor"
+                labelPlacement="stacked"
+                {...register('debtor', { required: true, maxLength: 20 })}
+                type="text"
+                placeholder="Nombre"
+              />
+              {errors.debtor && <p role="alert">{errors.debtor.message ? 'Error A' : 'Error B'}</p>}
+            </IonItem>
+            <IonItem>
+              <IonInput
+                label="Cantidad a prestar"
+                labelPlacement="stacked"
+                {...register('amount', { required: true, max: 1000000 })}
+                value={amount}
+                type="text"
+                placeholder="Monto"
+                onIonInput={handleAmountChange}
+              />
+            </IonItem>
+            <IonItem>
+              <IonInput
+                label="Tasa de interés?"
+                labelPlacement="stacked"
+                {...register('interest', { required: true, max: 100 })}
+                value={interest}
+                type="number"
+                placeholder="Porcentaje"
+              />
+            </IonItem>
+            <IonItem>
+              <IonLabel>Fecha de pago</IonLabel>
+              <IonDatetimeButton datetime="datetime" mode='ios'></IonDatetimeButton>
+
+              <IonModal keepContentsMounted={true}>
+                <IonDatetime
+                  presentation='date'
+                  id="datetime"
+                  showDefaultButtons={true}
+                  min={new Date().toISOString()}
+                  onIonChange={handleDateChange}
+                  value={selectedDate}></IonDatetime>
+              </IonModal>
+            </IonItem>
+
+            <IonButton type="submit">Next</IonButton>
+          </form>
+
+
         </IonContent>
       </IonModal>
     </>
