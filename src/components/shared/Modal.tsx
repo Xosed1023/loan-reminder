@@ -5,6 +5,8 @@ import { generateUniqueId, replaceAll, transformNumbers } from "../../utilities/
 import { Loan } from "../../models/Loan";
 import { IndexedDBService } from "../../persistence/IndexedDBService";
 import { useForm } from "react-hook-form";
+import { ErrorMessage } from "@hookform/error-message";
+import './Modal.css';
 
 interface ModalProps {
   setLoans: any;
@@ -22,7 +24,14 @@ const Modal = ({ setLoans, isOpen, closeModal, editableLoan, indexedDBService }:
   const [interest, setInterest] = useState<string | number>();
 
   const modal = useRef<HTMLIonModalElement>(null);
-  const { register, handleSubmit, formState: { errors }, } = useForm();
+  const {
+    register,
+    formState: { errors },
+    handleSubmit,
+    clearErrors
+  } = useForm({
+    criteriaMode: "all"
+  });
 
   const form = {
     amount: useRef<HTMLIonInputElement>(null),
@@ -49,20 +58,6 @@ const Modal = ({ setLoans, isOpen, closeModal, editableLoan, indexedDBService }:
     setInterest('');
   }
 
-  function confirm() {
-    const debtorValue = form.debtor.current?.value;
-    const amountValue = form.amount.current?.value;
-    const interestValue = form.interest.current?.value;
-
-    const formData = {
-      debtor: debtorValue,
-      amount: amountValue,
-      interest: interestValue,
-    };
-
-    modal.current?.dismiss(formData, 'confirm');
-  }
-
   const handleAmountChange = (event: any) => {
     const value = event.target.value;
     setAmount(transformNumbers(value));
@@ -87,9 +82,11 @@ const Modal = ({ setLoans, isOpen, closeModal, editableLoan, indexedDBService }:
 
   const onSubmit = (data: any) => {
     console.log("onSubmit", data);
+
+    const { debtor, amount, interest, date: payDate } = data;
+    const formData = { debtor, amount, interest, payDate };
+    modal.current?.dismiss(formData, 'confirm');
   }
-
-
 
   return (
     <>
@@ -101,9 +98,9 @@ const Modal = ({ setLoans, isOpen, closeModal, editableLoan, indexedDBService }:
               <IonButton onClick={() => modal.current?.dismiss()}>Cancelar</IonButton>
             </IonButtons>
             <IonButtons slot="end">
-              <IonButton strong={true} onClick={() => confirm()}>
+              {/* <IonButton strong={true} onClick={() => confirm()}>
                 Confirmar
-              </IonButton>
+              </IonButton> */}
             </IonButtons>
           </IonToolbar>
         </IonHeader>
@@ -118,31 +115,86 @@ const Modal = ({ setLoans, isOpen, closeModal, editableLoan, indexedDBService }:
               <IonInput
                 label="Nombre del deudor"
                 labelPlacement="stacked"
-                {...register('debtor', { required: true, maxLength: 20 })}
+                onIonFocus={() => clearErrors()}
+                {...register("debtor", {
+                  required: "¿A quién le vas a prestar?",
+                  minLength: {
+                    value: 3,
+                    message: "Este nombre parece corto"
+                  }
+                })}
                 type="text"
                 placeholder="Nombre"
               />
-              {errors.debtor && <p role="alert">{errors.debtor.message ? 'Error A' : 'Error B'}</p>}
+              <ErrorMessage
+                errors={errors}
+                name="debtor"
+                render={({ messages }) => {
+                  return messages
+                    ? Object.entries(messages).map(([type, message]) => (
+                      <IonLabel className="ion-text-alert" color="danger" key={type}>{message}</IonLabel>
+                    ))
+                    : null;
+                }}
+              />
             </IonItem>
+
             <IonItem>
               <IonInput
                 label="Cantidad a prestar"
                 labelPlacement="stacked"
-                {...register('amount', { required: true, max: 1000000 })}
+                onClick={() => clearErrors()}
+                {...register('amount', {
+                  required: "¿Cuánto vas a prestar?",
+                  min: {
+                    value: 1,
+                    message: "¿Cuánto vas a prestar?"
+                  },
+                  max: {
+                    value: 999999999,
+                    message: "Puedes prestar máximo $999.999.999"
+                  }
+                })}
+
                 value={amount}
                 type="text"
                 placeholder="Monto"
                 onIonInput={handleAmountChange}
               />
+              <ErrorMessage
+                errors={errors}
+                name="amount"
+                render={({ messages }) => {
+                  return messages
+                    ? Object.entries(messages).map(([type, message]) => (
+                      <IonLabel className="ion-text-alert" color="danger" key={type}>{message}</IonLabel>
+                    ))
+                    : null;
+                }}
+              />
             </IonItem>
+
+
             <IonItem>
               <IonInput
-                label="Tasa de interés?"
+                label="¿Tasa de interés?"
                 labelPlacement="stacked"
-                {...register('interest', { required: true, max: 100 })}
+                onClick={() => clearErrors()}
+                {...register('interest', { required: "Define un porcentaje de interés", max: { value: 100, message: "El porcentaje no puede ser mayor a 100%" } })}
                 value={interest}
                 type="number"
                 placeholder="Porcentaje"
+              />
+              <ErrorMessage
+                errors={errors}
+                name="interest"
+                render={({ messages }) => {
+                  return messages
+                    ? Object.entries(messages).map(([type, message]) => (
+                      <IonLabel className="ion-text-alert" color="danger" key={type}>{message}</IonLabel>
+                    ))
+                    : null;
+                }}
               />
             </IonItem>
             <IonItem>
@@ -160,10 +212,8 @@ const Modal = ({ setLoans, isOpen, closeModal, editableLoan, indexedDBService }:
               </IonModal>
             </IonItem>
 
-            <IonButton type="submit">Next</IonButton>
+            <IonButton expand="block" type="submit">Agregar</IonButton>
           </form>
-
-
         </IonContent>
       </IonModal>
     </>

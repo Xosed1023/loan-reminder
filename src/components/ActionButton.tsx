@@ -1,7 +1,6 @@
 import { IonFab, IonFabButton, IonIcon } from '@ionic/react';
 import { add } from 'ionicons/icons';
 import './ActionButton.css';
-import { IndexedDBService } from '../persistence/IndexedDBService';
 
 interface AddLoanButtonProps {
   openModal: () => void;
