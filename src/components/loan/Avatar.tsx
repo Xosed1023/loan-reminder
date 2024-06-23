@@ -16,8 +16,7 @@ const Avatar: React.FC<AvatarProps> = ({ loan }) => {
   const [avatarClass, setAvatarClass] = useState('');
 
   useEffect(() => {
-    console.log(">>> | loan.name:", loan.name)
-    const wordsName = loan.name.split(' ');
+    const wordsName = loan.name.trimEnd().split(' ');
     let initials = '';
     if (wordsName.length > 1) {
       initials = wordsName[0][0] + wordsName[1][0];
