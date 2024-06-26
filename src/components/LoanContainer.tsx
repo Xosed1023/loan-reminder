@@ -72,6 +72,10 @@ function LoanContainer({ loans, setLoans, openModal }: any) {
     return `${year}/${month}/${day}`;
   };
 
+  const calculateTotalAmount = (amount: number, interest: number) => {
+    return amount + (amount * interest / 100);
+  };
+
   return (
     <>
       <h1 className="ion-text-primary">Tus prestamos</h1>
@@ -116,7 +120,7 @@ function LoanContainer({ loans, setLoans, openModal }: any) {
                   <div className="label-content ion-text-capitalize">
                     <p>{loan.name}</p>
                     <div className="label-info">
-                      <Amount amount={loan.amount} color={getColor(loan)}></Amount>
+                      <Amount amount={calculateTotalAmount(loan.amount, loan.interestRate)} color={getColor(loan)}></Amount>
                       <p className="payment-date">{formatDate(loan.payDate)}</p>
                     </div>
                   </div>

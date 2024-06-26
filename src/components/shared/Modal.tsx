@@ -4,7 +4,7 @@ import { useRef, useState, useEffect } from "react";
 import { generateUniqueId, replaceAll } from "../../utilities/transform";
 import { Loan } from "../../models/Loan";
 import { IndexedDBService } from "../../persistence/IndexedDBService";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { ErrorMessage } from "@hookform/error-message";
 import './Modal.css';
 
@@ -19,6 +19,7 @@ interface ModalProps {
 const Modal = ({ setLoans, isOpen, closeModal, editableLoan, indexedDBService }: ModalProps) => {
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString());
   const [buttonText, setButtonText] = useState<string>("Agregar");
+  const [totalAmount, setTotalAmount] = useState<number>(0);
 
   const modal = useRef<HTMLIonModalElement>(null);
 
@@ -29,7 +30,7 @@ const Modal = ({ setLoans, isOpen, closeModal, editableLoan, indexedDBService }:
     clearErrors,
     reset,
     setValue,
-    getValues
+    watch
   } = useForm({
     criteriaMode: "all",
     defaultValues: {
@@ -83,6 +84,23 @@ const Modal = ({ setLoans, isOpen, closeModal, editableLoan, indexedDBService }:
     const formattedValue = formatAmount(rawValue);
     setValue('amount', formattedValue);
   };
+
+  const calculateTotalAmount = (amount: number, interest: number) => {
+    return amount + (amount * interest / 100);
+  };
+
+  const watchedAmount = watch('amount');
+  const watchedInterest = watch('interest');
+
+  useEffect(() => {
+    const amount = Number(replaceAll(watchedAmount ?? '', '.', ''));
+    const interest = Number(watchedInterest ?? '');
+    if (!isNaN(amount) && !isNaN(interest)) {
+      setTotalAmount(calculateTotalAmount(amount, interest));
+    } else {
+      setTotalAmount(0);
+    }
+  }, [watchedAmount, watchedInterest]);
 
   function onWillDismiss(ev: CustomEvent<OverlayEventDetail>) {
     if (ev.detail.role === 'confirm') {
@@ -240,12 +258,16 @@ const Modal = ({ setLoans, isOpen, closeModal, editableLoan, indexedDBService }:
               </IonModal>
             </IonItem>
 
+            <IonItem>
+              <IonLabel color="success">Total a pagar: ${totalAmount.toLocaleString()}</IonLabel>
+            </IonItem>
+
             <IonButton expand="block" type="submit">{buttonText}</IonButton>
           </form>
         </IonContent>
       </IonModal>
     </>
-  )
+  );
 }
 
 export default Modal;
