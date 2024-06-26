@@ -1,16 +1,14 @@
 import { IonApp, IonIcon, IonLabel, IonPage, IonRouterOutlet, IonTabBar, IonTabButton, IonTabs } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
-import { Storage } from '@ionic/storage';
 import { ellipse, square, triangle } from 'ionicons/icons';
+import React, { useEffect } from 'react';
 import { Redirect, Route } from 'react-router';
-import './Splash.css';
+import { Loan } from '../models/Loan';
+import { IndexedDBService } from '../persistence/IndexedDBService';
 import Loans from './Loans';
+import './Splash.css';
 import Tab2 from './Tab2';
 import Tab3 from './Tab3';
-import { useState, useEffect } from 'react';
-import { Loan } from '../models/Loan';
-import React from 'react';
-import { IndexedDBService } from '../persistence/IndexedDBService';
 
 const Home: React.FC = () => {
   const [loans, setLoans] = React.useState<Loan[]>([]);
@@ -47,10 +45,7 @@ const Home: React.FC = () => {
       return 0;
     });
   }
-
-  useEffect(() => {
-    //fetchLoans();
-  }, [loans]);
+  
   return (
     <IonPage>
       <IonApp>
@@ -69,6 +64,7 @@ const Home: React.FC = () => {
               <Route exact path="/home">
                 <Redirect to="/loans" />
               </Route>
+              <Redirect exact from="/" to="/loans" />
             </IonRouterOutlet>
             <IonTabBar slot="bottom">
               <IonTabButton tab="loans" href="/loans">
