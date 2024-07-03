@@ -399,3 +399,4 @@ FodyWeavers.xsd
 
 resources/ios/**/*
 resources/android/**/*
+dist

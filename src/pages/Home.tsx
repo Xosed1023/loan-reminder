@@ -1,73 +1,77 @@
-import { IonApp, IonIcon, IonLabel, IonPage, IonRouterOutlet, IonTabBar, IonTabButton, IonTabs } from '@ionic/react';
+import {
+  IonApp,
+  IonIcon,
+  IonLabel,
+  IonPage,
+  IonRouterOutlet,
+  IonTabBar,
+  IonTabButton,
+  IonTabs
+} from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
-import { ellipse, square, triangle } from 'ionicons/icons';
-import React, { useEffect } from 'react';
+import { triangle } from 'ionicons/icons';
+import React, { useEffect, useRef, useState } from 'react';
 import { Redirect, Route } from 'react-router';
 import { Loan } from '../models/Loan';
 import { IndexedDBService } from '../persistence/IndexedDBService';
 import Loans from './Loans';
-import './Splash.css';
-import Tab2 from './Tab2';
-import Tab3 from './Tab3';
-import { AdMob, AdOptions, AdLoadInfo, InterstitialAdPluginEvents } from '@capacitor-community/admob';
+import { AdMob, AdOptions, InterstitialAdPluginEvents } from '@capacitor-community/admob';
 
 const Home: React.FC = () => {
-  const [loans, setLoans] = React.useState<Loan[]>([]);
+  const [loans, setLoans] = useState<Loan[]>([]);
   const db = IndexedDBService.getInstance();
+  const isInitialized = useRef(false);
+  const [isAdVisible, setIsAdVisible] = useState(true);
 
-  const fetchLoans = async (desde: string = "No identificado") => {
-    console.log("fetchLoans desde: ", desde);
-    db.getAllLoans().then(loans => {
+  const fetchLoans = async (from: string = "No identificado") => {
+    // console.log("fetchLoans desde: ", from);
+    try {
+      const loans = await db.getAllLoans();
       sortLoans(loans);
-      setLoans(loans)
-    }).catch(error => {
-      console.error(`Error consultando prestamo ${error}`);
-      setLoans([])
-    });
+      setLoans(loans);
+    } catch (error) {
+      console.error(`Error consultando préstamo ${error}`);
+      setLoans([]);
+    }
   };
 
-  const initialize = async () => {
+  const initializeAdMob = async () => {
     try {
-      const { status } = await AdMob.trackingAuthorizationStatus();
-      console.log("🚀 ~ ========= status:", status)
-      if (status === 'notDetermined') {
-        console.log("initialize: notDetermined");
-      }
-
-    } catch (error) {
-      console.log("🚀 ~ initialize ~ error 1:", error)
-
-    }
-
-    try {
-
-
-
-      AdMob.initialize({
+      await AdMob.initialize({
         requestTrackingAuthorization: true,
         testingDevices: ['TESTDEVICE'],
         initializeForTesting: true
-      })
+      });
+      // console.log("AdMob inicializado");
     } catch (error) {
-      console.log("🚀 ~ initialize ~ error:", error)
+      console.error("Error al inicializar AdMob", error);
     }
   };
 
   useEffect(() => {
-    initialize().then(() => {
-      console.log("Mostrando intersticial");
+    // console.log(">>> | isAdVisible:", isAdVisible)
+    if (!isAdVisible) {
+      // console.log(new Date().toTimeString().split(' ')[0], "Se debe cargar intersticial");
       setTimeout(() => {
-        showInterstitial();
-      }, 3000)
-    });
+        showAdMobInterstitial();
+      }, 15000)
+    } else {
+      // console.log(new Date().toTimeString().split(' ')[0], "intersticial abierto");
+    }
+  }, [isAdVisible]);
+
+  useEffect(() => {
+
+    initializeAdMob();
+    // console.log(">>> | isAdVisible:", isAdVisible)
+    setIsAdVisible(false);
 
     db.openDatabase().then(() => {
       fetchLoans("Effect de inicio");
     }).catch(error => {
       console.error(`Error al abrir la base de datos ${error}`);
-      setLoans([])
+      setLoans([]);
     });
-
   }, []);
 
   const sortLoans = (loans: Loan[]) => {
@@ -80,19 +84,54 @@ const Home: React.FC = () => {
       }
       return 0;
     });
-  }
+  };
 
-  const showInterstitial = async (): Promise<void> => {
-    const options: AdOptions = {
-      adId: 'ca-app-pub-3940256099942544/1033173712',
-      isTesting: true
-      // npa: true
+  const showAdMobInterstitial = async (): Promise<void> => {
+    try {
+      const options: AdOptions = {
+        adId: 'ca-app-pub-3940256099942544/1033173712',
+        isTesting: true
+      };
+      await AdMob.prepareInterstitial(options);
+      AdMob.showInterstitial().then(() => {
+        setIsAdVisible(true);
+      });
+    } catch (error) {
+      console.error("Error mostrando intersticial", error);
+      setIsAdVisible(false);
+    }
+  };
+
+  useEffect(() => {
+    const onDismissListener = AdMob.addListener(
+      InterstitialAdPluginEvents.Dismissed,
+      () => {
+        // console.log(new Date().toTimeString().split(' ')[0], "Se cerró el intersticial");
+        setIsAdVisible(false);
+      }
+    );
+    const onFailedListener = AdMob.addListener(
+      InterstitialAdPluginEvents.FailedToLoad,
+      () => {
+        // console.log(new Date().toTimeString().split(' ')[0], "Fallo al cargar el intersticial");
+        setIsAdVisible(false);
+      }
+    );
+
+    const onLoadListener = AdMob.addListener(
+      InterstitialAdPluginEvents.Showed,
+      () => {
+        // console.log("Se muestra el intersticial");
+        setIsAdVisible(true);
+      }
+    );
+
+    return () => {
+      onDismissListener.remove();
+      onFailedListener.remove();
+      onLoadListener.remove();
     };
-    console.log("A")
-    await AdMob.prepareInterstitial(options);
-    console.log("B")
-    await AdMob.showInterstitial();
-  }
+  }, []);
 
   return (
     <IonPage>
