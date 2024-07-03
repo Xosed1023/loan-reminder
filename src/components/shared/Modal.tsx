@@ -37,7 +37,8 @@ const Modal = ({ setLoans, isOpen, closeModal, editableLoan, indexedDBService }:
       debtor: "",
       amount: "",
       interest: "",
-      date: new Date().toISOString().split('T')[0]
+      date: new Date().toISOString().split('T')[0],
+      concept: "" // default value for concept
     }
   });
 
@@ -48,7 +49,8 @@ const Modal = ({ setLoans, isOpen, closeModal, editableLoan, indexedDBService }:
         debtor: editableLoan.name,
         amount: formatAmount(editableLoan.amount.toString()),
         interest: editableLoan.interestRate.toString(),
-        date: editableLoan.payDate
+        date: editableLoan.payDate,
+        concept: editableLoan.concept || "" // reset concept if exists
       });
       setSelectedDate(editableLoan.payDate);
     } else {
@@ -57,7 +59,8 @@ const Modal = ({ setLoans, isOpen, closeModal, editableLoan, indexedDBService }:
         debtor: "",
         amount: "",
         interest: "",
-        date: new Date().toISOString().split('T')[0]
+        date: new Date().toISOString().split('T')[0],
+        concept: "" // reset concept
       });
       setSelectedDate(new Date().toISOString());
     }
@@ -69,7 +72,8 @@ const Modal = ({ setLoans, isOpen, closeModal, editableLoan, indexedDBService }:
         debtor: "",
         amount: "",
         interest: "",
-        date: new Date().toISOString().split('T')[0]
+        date: new Date().toISOString().split('T')[0],
+        concept: "" // reset concept
       });
       setSelectedDate(new Date().toISOString());
     }
@@ -110,6 +114,7 @@ const Modal = ({ setLoans, isOpen, closeModal, editableLoan, indexedDBService }:
         amount: Number(replaceAll(ev.detail.data.amount, '.', '')),
         interestRate: ev.detail.data.interest,
         payDate: selectedDate,
+        concept: ev.detail.data.concept, // add concept to loanData
         isPayed: editableLoan ? editableLoan.isPayed : false // Default isPayed to false for new loans
       };
 
@@ -130,8 +135,8 @@ const Modal = ({ setLoans, isOpen, closeModal, editableLoan, indexedDBService }:
   }
 
   const onSubmit = (data: any) => {
-    const { debtor, amount, interest, date: payDate } = data;
-    const formData = { debtor, amount, interest, payDate };
+    const { debtor, amount, interest, date: payDate, concept } = data; // add concept to destructured data
+    const formData = { debtor, amount, interest, payDate, concept }; // add concept to formData
     modal.current?.dismiss(formData, 'confirm');
   }
 
@@ -173,7 +178,7 @@ const Modal = ({ setLoans, isOpen, closeModal, editableLoan, indexedDBService }:
                 render={({ messages }) => {
                   return messages
                     ? Object.entries(messages).map(([type, message]) => (
-                      <IonLabel className="ion-text-alert" color="danger" key={type}>{message}</IonLabel>
+                      <IonLabel className="ion-text-alert error-message show" color="danger" key={type}>{message}</IonLabel>
                     ))
                     : null;
                 }}
@@ -206,7 +211,7 @@ const Modal = ({ setLoans, isOpen, closeModal, editableLoan, indexedDBService }:
                 render={({ messages }) => {
                   return messages
                     ? Object.entries(messages).map(([type, message]) => (
-                      <IonLabel className="ion-text-alert" color="danger" key={type}>{message}</IonLabel>
+                      <IonLabel className="ion-text-alert error-message show" color="danger" key={type}>{message}</IonLabel>
                     ))
                     : null;
                 }}
@@ -231,7 +236,7 @@ const Modal = ({ setLoans, isOpen, closeModal, editableLoan, indexedDBService }:
                 render={({ messages }) => {
                   return messages
                     ? Object.entries(messages).map(([type, message]) => (
-                      <IonLabel className="ion-text-alert" color="danger" key={type}>{message}</IonLabel>
+                      <IonLabel className="ion-text-alert error-message show" color="danger" key={type}>{message}</IonLabel>
                     ))
                     : null;
                 }}
@@ -256,6 +261,34 @@ const Modal = ({ setLoans, isOpen, closeModal, editableLoan, indexedDBService }:
                   }}
                 />
               </IonModal>
+            </IonItem>
+
+            <IonItem>
+              <IonInput
+                label="Concepto"
+                labelPlacement="stacked"
+                {...register("concept", {
+                  required: "¿Cuál es el concepto del préstamo?",
+                  minLength: {
+                    value: 3,
+                    message: "Este concepto parece corto"
+                  }
+                })}
+                type="text"
+                placeholder="Concepto"
+                onIonBlur={() => clearErrors("concept")}
+              />
+              <ErrorMessage
+                errors={errors}
+                name="concept"
+                render={({ messages }) => {
+                  return messages
+                    ? Object.entries(messages).map(([type, message]) => (
+                      <IonLabel className="ion-text-alert error-message show" color="danger" key={type}>{message}</IonLabel>
+                    ))
+                    : null;
+                }}
+              />
             </IonItem>
 
             <IonItem>

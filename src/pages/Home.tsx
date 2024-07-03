@@ -55,12 +55,12 @@ const Home: React.FC = () => {
               <Route exact path="/loans">
                 <Loans loans={loans} setLoans={setLoans} indexedDBService={db} />
               </Route>
-              <Route exact path="/tab2">
+              {/* <Route exact path="/tab2">
                 <Tab2 />
               </Route>
               <Route path="/tab3">
                 <Tab3 />
-              </Route>
+              </Route> */}
               <Route exact path="/home">
                 <Redirect to="/loans" />
               </Route>
@@ -71,14 +71,14 @@ const Home: React.FC = () => {
                 <IonIcon aria-hidden="true" icon={triangle} />
                 <IonLabel>Préstamos</IonLabel>
               </IonTabButton>
-              <IonTabButton tab="tab2" href="/tab2">
+              {/* <IonTabButton tab="tab2" href="/tab2">
                 <IonIcon aria-hidden="true" icon={ellipse} />
                 <IonLabel>Tab 2</IonLabel>
               </IonTabButton>
               <IonTabButton tab="tab3" href="/tab3">
                 <IonIcon aria-hidden="true" icon={square} />
                 <IonLabel>Tab 3</IonLabel>
-              </IonTabButton>
+              </IonTabButton> */}
             </IonTabBar>
           </IonTabs>
         </IonReactRouter>

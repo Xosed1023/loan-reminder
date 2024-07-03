@@ -34,7 +34,7 @@ const Loans: React.FC<LoansProps> = ({ loans, setLoans, indexedDBService }) => {
 
   return (
     <IonPage>
-      <IonContent fullscreen className='ion-padding'>
+      <IonContent fullscreen>
         {
           loans?.length > 0 &&
           <LoanContainer openModal={openModal} loans={loans} setLoans={setLoans} />

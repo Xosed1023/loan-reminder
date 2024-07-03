@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Loan Reminder</string>
+    <string name="title_activity_main">Loan Reminder</string>
+    <string name="package_name">io.zennyx.loanreminder</string>
+    <string name="custom_url_scheme">io.zennyx.loanreminder</string>
+</resources>

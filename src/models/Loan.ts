@@ -3,7 +3,9 @@ export interface Loan {
   name: string,
   amount: number,
   interestRate: number,
-  payDate: string,
+  payDate: string, // Fecha acordada para el pago
+  datePaid?: string, // Fecha en la que paga
   isPayed?: boolean,
   nameInitials?: string,
+  concept: string,
 }
