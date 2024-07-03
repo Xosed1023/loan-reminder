@@ -9,6 +9,7 @@ import Loans from './Loans';
 import './Splash.css';
 import Tab2 from './Tab2';
 import Tab3 from './Tab3';
+import { AdMob, AdOptions, AdLoadInfo, InterstitialAdPluginEvents } from '@capacitor-community/admob';
 
 const Home: React.FC = () => {
   const [loans, setLoans] = React.useState<Loan[]>([]);
@@ -25,13 +26,48 @@ const Home: React.FC = () => {
     });
   };
 
+  const initialize = async () => {
+    try {
+      const { status } = await AdMob.trackingAuthorizationStatus();
+      console.log("🚀 ~ ========= status:", status)
+      if (status === 'notDetermined') {
+        console.log("initialize: notDetermined");
+      }
+
+    } catch (error) {
+      console.log("🚀 ~ initialize ~ error 1:", error)
+
+    }
+
+    try {
+
+
+
+      AdMob.initialize({
+        requestTrackingAuthorization: true,
+        testingDevices: ['TESTDEVICE'],
+        initializeForTesting: true
+      })
+    } catch (error) {
+      console.log("🚀 ~ initialize ~ error:", error)
+    }
+  };
+
   useEffect(() => {
+    initialize().then(() => {
+      console.log("Mostrando intersticial");
+      setTimeout(() => {
+        showInterstitial();
+      }, 3000)
+    });
+
     db.openDatabase().then(() => {
       fetchLoans("Effect de inicio");
     }).catch(error => {
       console.error(`Error al abrir la base de datos ${error}`);
       setLoans([])
     });
+
   }, []);
 
   const sortLoans = (loans: Loan[]) => {
@@ -45,7 +81,19 @@ const Home: React.FC = () => {
       return 0;
     });
   }
-  
+
+  const showInterstitial = async (): Promise<void> => {
+    const options: AdOptions = {
+      adId: 'ca-app-pub-3940256099942544/1033173712',
+      isTesting: true
+      // npa: true
+    };
+    console.log("A")
+    await AdMob.prepareInterstitial(options);
+    console.log("B")
+    await AdMob.showInterstitial();
+  }
+
   return (
     <IonPage>
       <IonApp>

@@ -149,12 +149,12 @@ const Modal = ({ setLoans, isOpen, closeModal, editableLoan, indexedDBService }:
             <IonButtons slot="start">
               <IonButton onClick={() => modal.current?.dismiss()}>Cancelar</IonButton>
             </IonButtons>
+          <IonTitle color="primary">
+            {editableLoan ? 'Editar Préstamo' : 'Nuevo Préstamo'}
+          </IonTitle>
           </IonToolbar>
         </IonHeader>
         <IonContent className="ion-padding">
-          <IonTitle className='ion-text-center ion-margin-bottom' color="primary">
-            {editableLoan ? 'Editar Préstamo' : 'Nuevo Préstamo'}
-          </IonTitle>
 
           <form onSubmit={handleSubmit(onSubmit)}>
             <IonItem>
