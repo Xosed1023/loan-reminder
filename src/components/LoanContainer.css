@@ -1,4 +1,4 @@
-*{
+* {
   font-size: 18px !important;
 }
 
@@ -84,8 +84,9 @@ ion-select::part(icon) {
   top: 0;
   width: 100%;
   z-index: 1000;
-  /* Asegúrate de que esté por encima de otros elementos */
   backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  -moz-backdrop-filter: blur(10px);
   -webkit-box-shadow: 0px 3px 5px 0px rgba(0, 0, 0, 0.25);
   -moz-box-shadow: 0px 3px 5px 0px rgba(0, 0, 0, 0.25);
   box-shadow: 0px 3px 5px 0px rgba(0, 0, 0, 0.25);
@@ -94,9 +95,7 @@ ion-select::part(icon) {
 .loan-item.deleting {
   opacity: 0;
   transform: translateX(-100%);
-  /* Desliza hacia la izquierda */
   transition: opacity 0.3s ease-out, transform 0.3s ease-out;
-  /* Agrega la transición para ambos efectos */
 }
 
 .no-results {
@@ -108,7 +107,7 @@ ion-select::part(icon) {
   width: 100%
 }
 
-.list-container{
+.list-container {
   padding-bottom: 40px;
   background-color: transparent;
   box-shadow: none;

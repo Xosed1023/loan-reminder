@@ -54,7 +54,7 @@ const Home: React.FC = () => {
       // console.log(new Date().toTimeString().split(' ')[0], "Se debe cargar intersticial");
       setTimeout(() => {
         showAdMobInterstitial();
-      }, 15000)
+      }, 30000)
     } else {
       // console.log(new Date().toTimeString().split(' ')[0], "intersticial abierto");
     }
