@@ -1,4 +1,4 @@
-import { IonButton, IonButtons, IonContent, IonDatetime, IonDatetimeButton, IonHeader, IonInput, IonItem, IonLabel, IonModal, IonTitle, IonToolbar } from "@ionic/react";
+import { IonButton, IonButtons, IonContent, IonDatetime, IonDatetimeButton, IonHeader, IonInput, IonItem, IonLabel, IonModal, IonTitle, IonToolbar, IonCheckbox, IonIcon, IonPopover } from "@ionic/react";
 import { OverlayEventDetail } from "@ionic/react/dist/types/components/react-component-lib/interfaces";
 import { useRef, useState, useEffect } from "react";
 import { generateUniqueId, replaceAll } from "../../utilities/transform";
@@ -6,6 +6,7 @@ import { Loan } from "../../models/Loan";
 import { IndexedDBService } from "../../persistence/IndexedDBService";
 import { useForm, useWatch } from "react-hook-form";
 import { ErrorMessage } from "@hookform/error-message";
+import { helpCircleOutline } from 'ionicons/icons';
 import './Modal.css';
 
 interface ModalProps {
@@ -20,6 +21,7 @@ const Modal = ({ setLoans, isOpen, closeModal, editableLoan, indexedDBService }:
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString());
   const [buttonText, setButtonText] = useState<string>("Agregar");
   const [totalAmount, setTotalAmount] = useState<number>(0);
+  const [isPayed, setIsPayed] = useState<boolean>(false);
 
   const modal = useRef<HTMLIonModalElement>(null);
 
@@ -53,6 +55,7 @@ const Modal = ({ setLoans, isOpen, closeModal, editableLoan, indexedDBService }:
         concept: editableLoan.concept || "" // reset concept if exists
       });
       setSelectedDate(editableLoan.payDate);
+      setIsPayed(editableLoan.isPayed!); // Set the checkbox value
     } else {
       setButtonText("Agregar");
       reset({
@@ -63,6 +66,7 @@ const Modal = ({ setLoans, isOpen, closeModal, editableLoan, indexedDBService }:
         concept: "" // reset concept
       });
       setSelectedDate(new Date().toISOString());
+      setIsPayed(false); // Reset the checkbox value
     }
   }, [editableLoan, reset]);
 
@@ -76,6 +80,7 @@ const Modal = ({ setLoans, isOpen, closeModal, editableLoan, indexedDBService }:
         concept: "" // reset concept
       });
       setSelectedDate(new Date().toISOString());
+      setIsPayed(false); // Reset the checkbox value
     }
   }, [isOpen, reset]);
 
@@ -115,7 +120,7 @@ const Modal = ({ setLoans, isOpen, closeModal, editableLoan, indexedDBService }:
         interestRate: ev.detail.data.interest,
         payDate: selectedDate,
         concept: ev.detail.data.concept, // add concept to loanData
-        isPayed: editableLoan ? editableLoan.isPayed : false // Default isPayed to false for new loans
+        isPayed: editableLoan ? isPayed : false // Update isPayed based on the checkbox
       };
 
       if (editableLoan) {
@@ -149,9 +154,9 @@ const Modal = ({ setLoans, isOpen, closeModal, editableLoan, indexedDBService }:
             <IonButtons slot="start">
               <IonButton onClick={() => modal.current?.dismiss()}>Cancelar</IonButton>
             </IonButtons>
-          <IonTitle color="primary">
-            {editableLoan ? 'Editar Préstamo' : 'Nuevo Préstamo'}
-          </IonTitle>
+            <IonTitle color="primary">
+              {editableLoan ? 'Editar Préstamo' : 'Nuevo Préstamo'}
+            </IonTitle>
           </IonToolbar>
         </IonHeader>
         <IonContent className="ion-padding">
@@ -230,6 +235,14 @@ const Modal = ({ setLoans, isOpen, closeModal, editableLoan, indexedDBService }:
                 placeholder="Porcentaje"
                 onIonBlur={() => clearErrors("interest")}
               />
+              <IonButton id="interest-popover" slot="end" fill="clear">
+                <IonIcon icon={helpCircleOutline} />
+              </IonButton>
+              <IonPopover  trigger="interest-popover" triggerAction="click">
+                <IonContent className="ion-padding-horizontal">
+                  <p>El interés es el porcentaje adicional que se añadirá al monto total prestado.</p>
+                </IonContent>
+              </IonPopover>
               <ErrorMessage
                 errors={errors}
                 name="interest"
@@ -242,6 +255,8 @@ const Modal = ({ setLoans, isOpen, closeModal, editableLoan, indexedDBService }:
                 }}
               />
             </IonItem>
+
+
 
             <IonItem>
               <IonLabel>Fecha de pago</IonLabel>
@@ -294,6 +309,16 @@ const Modal = ({ setLoans, isOpen, closeModal, editableLoan, indexedDBService }:
             <IonItem>
               <IonLabel color="success">Total a pagar: ${totalAmount.toLocaleString()}</IonLabel>
             </IonItem>
+
+            {editableLoan && editableLoan.isPayed && (
+              <IonItem>
+                <IonLabel>Préstamo Pagado</IonLabel>
+                <IonCheckbox
+                  checked={isPayed}
+                  onIonChange={(e) => setIsPayed(e.detail.checked)}
+                />
+              </IonItem>
+            )}
 
             <IonButton expand="block" type="submit">{buttonText}</IonButton>
           </form>

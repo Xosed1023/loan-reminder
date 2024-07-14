@@ -1,1 +1,1 @@
-App para recordatorio de prestamos
+App para recordatorio de préstamos

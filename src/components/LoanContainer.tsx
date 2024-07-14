@@ -13,12 +13,14 @@ function LoanContainer({ loans, setLoans, openModal }: any) {
   const [filteredLoans, setFilteredLoans] = useState(loans);
   const [sortCriteria, setSortCriteria] = useState('');
 
-  const [selectedLoan, setSelectedLoan] = useState<Loan | null>(null); // State for the selected loan
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false); // State for modal visibility
-  const [showAlert, setShowAlert] = useState<boolean>(false); // State for alert visibility
-  const [loanToDelete, setLoanToDelete] = useState<Loan | null>(null); // State for loan to delet
-  const [slidingLoanToDelete, setSlidingLoanToDelete] = useState<any>(null); // State for loan to delet
-
+  const [selectedLoan, setSelectedLoan] = useState<Loan | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [showDeleteAlert, setShowDeleteAlert] = useState<boolean>(false);
+  const [showMarkAsPaidAlert, setShowMarkAsPaidAlert] = useState<boolean>(false); // Estado para la alerta de marcar como pagado
+  const [loanToDelete, setLoanToDelete] = useState<Loan | null>(null);
+  const [slidingLoanToDelete, setSlidingLoanToDelete] = useState<any>(null);
+  const [loanToMarkAsPaid, setLoanToMarkAsPaid] = useState<Loan | null>(null); // Estado para el préstamo a marcar como pagado
+  const [slidingLoanToMarkAsPaid, setSlidingLoanToMarkAsPaid] = useState<any>(null); // Estado para el sliding del préstamo a marcar como pagado
 
   useEffect(() => {
     filterAndSortLoans();
@@ -47,7 +49,6 @@ function LoanContainer({ loans, setLoans, openModal }: any) {
   };
 
   const handleDeleteLoan = async (loan: Loan) => {
-    // Animación para eliminar el préstamo
     const loanElement = slidingLoanToDelete.closest('.loan-item');
     if (loanElement) {
       loanElement.classList.add('deleting');
@@ -55,14 +56,14 @@ function LoanContainer({ loans, setLoans, openModal }: any) {
         const db = IndexedDBService.getInstance();
         await db.deleteLoan(loan.id);
         setLoans(loans.filter((l: any) => l.id !== loan.id));
-      }, 300); // Tiempo para la animación, ajusta según sea necesario
+      }, 300);
     }
   };
 
   const confirmDeleteLoan = (loan: Loan, slidingItem: HTMLIonItemSlidingElement) => {
     setSlidingLoanToDelete(slidingItem);
     setLoanToDelete(loan);
-    setShowAlert(true);
+    setShowDeleteAlert(true);
   };
 
   const handleLoanClick = (loan: Loan) => {
@@ -74,13 +75,18 @@ function LoanContainer({ loans, setLoans, openModal }: any) {
     setSortCriteria(ev.detail.value);
   };
 
+  const confirmMarkAsPaid = (loan: Loan, slidingItem: HTMLIonItemSlidingElement) => {
+    setSlidingLoanToMarkAsPaid(slidingItem);
+    setLoanToMarkAsPaid(loan);
+    setShowMarkAsPaidAlert(true);
+  };
+
   const handleMarkAsPaid = async (loan: Loan, slidingItem: any) => {
     const db = IndexedDBService.getInstance();
     const updatedLoan = { ...loan, isPayed: true, datePaid: new Date().toISOString() };
     await db.updateLoan(updatedLoan);
     setLoans(loans.map((l: any) => l.id === loan.id ? updatedLoan : l));
 
-    // Cerrar el IonItemSliding
     await slidingItem.closeOpened();
   };
 
@@ -121,7 +127,7 @@ function LoanContainer({ loans, setLoans, openModal }: any) {
     <>
       <IonHeader>
         <IonToolbar>
-          <IonTitle>Tus prestamos</IonTitle>
+          <IonTitle>Tus préstamos</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent>
@@ -182,20 +188,24 @@ function LoanContainer({ loans, setLoans, openModal }: any) {
                     </IonLabel>
                   </IonItem>
                   <IonItemOptions side="end">
-                    <IonItemOption mode="ios" color="success" onClick={(e: any) => handleMarkAsPaid(loan, e.target.closest('ion-item-sliding'))}>
+                    <IonItemOption
+                      mode="ios"
+                      color="success"
+                      onClick={(e: any) => confirmMarkAsPaid(loan, e.target.closest('ion-item-sliding'))}
+                      disabled={loan.isPayed}
+                      hidden={loan.isPayed}
+                    >
                       <IonIcon icon={checkmarkOutline}></IonIcon>
                     </IonItemOption>
                     <IonItemOption
                       mode="ios"
                       color="danger"
                       onClick={(e: React.MouseEvent<HTMLIonItemOptionElement>) =>
-                        /* handleDeleteLoan(loan, e.currentTarget.closest('ion-item-sliding') as HTMLIonItemSlidingElement) */
                         confirmDeleteLoan(loan, e.currentTarget.closest('ion-item-sliding') as HTMLIonItemSlidingElement)
                       }
                     >
                       <IonIcon icon={trashOutline}></IonIcon>
                     </IonItemOption>
-
                   </IonItemOptions>
                 </IonItemSliding>
               )}
@@ -203,8 +213,8 @@ function LoanContainer({ loans, setLoans, openModal }: any) {
           </IonCard>
         )}
         <IonAlert
-          isOpen={showAlert}
-          onDidDismiss={() => setShowAlert(false)}
+          isOpen={showDeleteAlert}
+          onDidDismiss={() => setShowDeleteAlert(false)}
           header={'Confirmar eliminación'}
           message={`¿Está seguro de que desea eliminar el préstamo "${loanToDelete?.name}"? Esta acción no se puede deshacer.`}
           buttons={[
@@ -221,6 +231,31 @@ function LoanContainer({ loans, setLoans, openModal }: any) {
                 if (loanToDelete) {
                   handleDeleteLoan(loanToDelete);
                   setLoanToDelete(null);
+                }
+              }
+            }
+          ]}
+        />
+        <IonAlert
+          isOpen={showMarkAsPaidAlert}
+          onDidDismiss={() => setShowMarkAsPaidAlert(false)}
+          header={'Confirmar pago'}
+          message={`¿Está seguro de que desea marcar el préstamo de ${loanToMarkAsPaid?.name} como pagado?`}
+          buttons={[
+            {
+              text: 'Cancelar',
+              role: 'cancel',
+              handler: () => {
+                setLoanToMarkAsPaid(null);
+              }
+            },
+            {
+              text: 'Aceptar',
+              handler: () => {
+                if (loanToMarkAsPaid && slidingLoanToMarkAsPaid) {
+                  handleMarkAsPaid(loanToMarkAsPaid, slidingLoanToMarkAsPaid);
+                  setLoanToMarkAsPaid(null);
+                  setSlidingLoanToMarkAsPaid(null);
                 }
               }
             }

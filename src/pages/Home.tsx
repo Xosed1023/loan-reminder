@@ -9,7 +9,7 @@ import {
   IonTabs
 } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
-import { triangle } from 'ionicons/icons';
+import { walletOutline } from 'ionicons/icons';
 import React, { useEffect, useRef, useState } from 'react';
 import { Redirect, Route } from 'react-router';
 import { Loan } from '../models/Loan';
@@ -155,7 +155,7 @@ const Home: React.FC = () => {
             </IonRouterOutlet>
             <IonTabBar slot="bottom">
               <IonTabButton tab="loans" href="/loans">
-                <IonIcon aria-hidden="true" icon={triangle} />
+                <IonIcon aria-hidden="true" icon={walletOutline} />
                 <IonLabel>Préstamos</IonLabel>
               </IonTabButton>
               {/* <IonTabButton tab="tab2" href="/tab2">
