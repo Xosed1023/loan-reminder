@@ -8,27 +8,27 @@ import { Redirect, Route } from 'react-router-dom';
 import Splash from './pages/Splash';
 
 /* Core CSS required for Ionic components to work properly */
-import '@ionic/react/css/core.css';
+import "@ionic/react/css/core.css";
 
 /* Basic CSS for apps built with Ionic */
-import '@ionic/react/css/normalize.css';
-import '@ionic/react/css/structure.css';
-import '@ionic/react/css/typography.css';
+import "@ionic/react/css/normalize.css";
+import "@ionic/react/css/structure.css";
+import "@ionic/react/css/typography.css";
 
 /* Optional CSS utils that can be commented out */
-import '@ionic/react/css/display.css';
-import '@ionic/react/css/flex-utils.css';
-import '@ionic/react/css/float-elements.css';
-import '@ionic/react/css/padding.css';
-import '@ionic/react/css/text-alignment.css';
-import '@ionic/react/css/text-transformation.css';
+import "@ionic/react/css/display.css";
+import "@ionic/react/css/flex-utils.css";
+import "@ionic/react/css/float-elements.css";
+import "@ionic/react/css/padding.css";
+import "@ionic/react/css/text-alignment.css";
+import "@ionic/react/css/text-transformation.css";
 
 /* Theme variables */
+import { ActionPerformed, PushNotificationSchema, PushNotifications, Token } from '@capacitor/push-notifications';
+import { Toast } from "@capacitor/toast";
+import { useEffect, useState } from 'react';
 import Home from './pages/Home';
 import './theme/variables.css';
-import { useEffect, useState } from 'react';
-import { PushNotificationSchema, PushNotifications, Token, ActionPerformed } from '@capacitor/push-notifications';
-import { Toast } from "@capacitor/toast";
 
 setupIonicReact();
 
@@ -53,6 +53,7 @@ const App: React.FC = () => {
         register();
       }
     });
+    getDeliveredNotifications();
 
 
   }, []);
@@ -98,9 +99,15 @@ const App: React.FC = () => {
     })
   }
 
+  const getDeliveredNotifications = async () => {
+    const notificationList =
+      await PushNotifications.getDeliveredNotifications();
+    alert(JSON.stringify(notificationList));
+  };
+
   return (
     <IonApp>
-      <IonButton color="success" expand="full" onClick={register}>Register for Push</IonButton>
+      {/* <IonButton color="success" expand="full" onClick={register}>Register for Push</IonButton> */}
       <IonReactRouter>
         <Route exact path="/" component={Splash} />
         <Route exact path="/home" component={Home} />

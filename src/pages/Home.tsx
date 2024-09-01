@@ -49,21 +49,17 @@ const Home: React.FC = () => {
   };
 
   useEffect(() => {
-    // console.log(">>> | isAdVisible:", isAdVisible)
     if (!isAdVisible) {
-      // console.log(new Date().toTimeString().split(' ')[0], "Se debe cargar intersticial");
       setTimeout(() => {
         showAdMobInterstitial();
-      }, 30000)
+      }, 60000)
     } else {
-      // console.log(new Date().toTimeString().split(' ')[0], "intersticial abierto");
     }
   }, [isAdVisible]);
 
   useEffect(() => {
 
     initializeAdMob();
-    // console.log(">>> | isAdVisible:", isAdVisible)
     setIsAdVisible(false);
 
     db.openDatabase().then(() => {
@@ -106,14 +102,12 @@ const Home: React.FC = () => {
     const onDismissListener = AdMob.addListener(
       InterstitialAdPluginEvents.Dismissed,
       () => {
-        // console.log(new Date().toTimeString().split(' ')[0], "Se cerró el intersticial");
         setIsAdVisible(false);
       }
     );
     const onFailedListener = AdMob.addListener(
       InterstitialAdPluginEvents.FailedToLoad,
       () => {
-        // console.log(new Date().toTimeString().split(' ')[0], "Fallo al cargar el intersticial");
         setIsAdVisible(false);
       }
     );
@@ -121,7 +115,6 @@ const Home: React.FC = () => {
     const onLoadListener = AdMob.addListener(
       InterstitialAdPluginEvents.Showed,
       () => {
-        // console.log("Se muestra el intersticial");
         setIsAdVisible(true);
       }
     );

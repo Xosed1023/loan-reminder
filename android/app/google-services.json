@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "547321866631",
-    "project_id": "loan-reminder-fcc20",
-    "storage_bucket": "loan-reminder-fcc20.appspot.com"
+    "project_number": "305177705013",
+    "project_id": "loan-reminder-44a10",
+    "storage_bucket": "loan-reminder-44a10.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:547321866631:android:1d9a01bb861fb148fb0b22",
+        "mobilesdk_app_id": "1:305177705013:android:52051fb60897a23de40f7c",
         "android_client_info": {
           "package_name": "io.zennyx.loanreminder"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyDEUMERpJRTdKra-7Vs56ijm0sI_pg12sM"
+          "current_key": "AIzaSyBdbzQmbhDKsyLFlNTuBvUjGbsOm53RbMY"
         }
       ],
       "services": {
