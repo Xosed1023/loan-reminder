@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "305177705013",
+    "project_id": "loan-reminder-44a10",
+    "storage_bucket": "loan-reminder-44a10.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:305177705013:android:52051fb60897a23de40f7c",
+        "android_client_info": {
+          "package_name": "io.zennyx.loanreminder"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBdbzQmbhDKsyLFlNTuBvUjGbsOm53RbMY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
