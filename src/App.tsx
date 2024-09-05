@@ -69,7 +69,7 @@ const App: React.FC = () => {
 
     // Some issue with our setup and push will not work
     PushNotifications.addListener("registrationError", (error: any) => {
-      alert("Error on registration: " + JSON.stringify(error));
+      //alert("Error on registration: " + JSON.stringify(error));
     });
 
     // Show us the notification payload if the app is open on our device
@@ -115,7 +115,7 @@ const App: React.FC = () => {
   const getDeliveredNotifications = async () => {
     const notificationList =
       await PushNotifications.getDeliveredNotifications();
-    alert(JSON.stringify(notificationList));
+    //alert(JSON.stringify(notificationList));
   };
 
   return (

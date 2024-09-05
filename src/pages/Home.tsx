@@ -6,16 +6,22 @@ import {
   IonRouterOutlet,
   IonTabBar,
   IonTabButton,
-  IonTabs
-} from '@ionic/react';
-import { IonReactRouter } from '@ionic/react-router';
-import { walletOutline } from 'ionicons/icons';
-import React, { useEffect, useRef, useState } from 'react';
-import { Redirect, Route } from 'react-router';
-import { Loan } from '../models/Loan';
-import { IndexedDBService } from '../persistence/IndexedDBService';
-import Loans from './Loans';
-import { AdMob, AdOptions, InterstitialAdPluginEvents } from '@capacitor-community/admob';
+  IonTabs,
+} from "@ionic/react";
+import { IonReactRouter } from "@ionic/react-router";
+import { walletOutline } from "ionicons/icons";
+import React, { useEffect, useRef, useState } from "react";
+import { Redirect, Route } from "react-router";
+import { Loan } from "../models/Loan";
+import { IndexedDBService } from "../persistence/IndexedDBService";
+import Loans from "./Loans";
+import {
+  AdMob,
+  AdOptions,
+  InterstitialAdPluginEvents,
+} from "@capacitor-community/admob";
+import { isPlatform } from "@ionic/react";
+import { Capacitor } from "@capacitor/core";
 
 const Home: React.FC = () => {
   const [loans, setLoans] = useState<Loan[]>([]);
@@ -39,8 +45,8 @@ const Home: React.FC = () => {
     try {
       await AdMob.initialize({
         requestTrackingAuthorization: true,
-        testingDevices: ['TESTDEVICE'],
-        initializeForTesting: true
+        testingDevices: ["TESTDEVICE"],
+        initializeForTesting: true,
       });
       // console.log("AdMob inicializado");
     } catch (error) {
@@ -52,22 +58,23 @@ const Home: React.FC = () => {
     if (!isAdVisible) {
       setTimeout(() => {
         showAdMobInterstitial();
-      }, 60000)
+      }, 60000);
     } else {
     }
   }, [isAdVisible]);
 
   useEffect(() => {
-
     initializeAdMob();
     setIsAdVisible(false);
 
-    db.openDatabase().then(() => {
-      fetchLoans("Effect de inicio");
-    }).catch(error => {
-      console.error(`Error al abrir la base de datos ${error}`);
-      setLoans([]);
-    });
+    db.openDatabase()
+      .then(() => {
+        fetchLoans("Effect de inicio");
+      })
+      .catch((error) => {
+        console.error(`Error al abrir la base de datos ${error}`);
+        setLoans([]);
+      });
   }, []);
 
   const sortLoans = (loans: Loan[]) => {
@@ -83,10 +90,17 @@ const Home: React.FC = () => {
   };
 
   const showAdMobInterstitial = async (): Promise<void> => {
+    let adId: string = "";
     try {
+      const platform = Capacitor.getPlatform();
+      if (platform === "ios") {
+        adId = "ca-app-pub-6255300430204769/2743050859";
+      } else if (platform === "android") {
+        adId = "ca-app-pub-6255300430204769/6171708718";
+      }
       const options: AdOptions = {
-        adId: 'ca-app-pub-3940256099942544/1033173712',
-        isTesting: true
+        adId: adId,
+        isTesting: true,
       };
       await AdMob.prepareInterstitial(options);
       AdMob.showInterstitial().then(() => {
@@ -133,7 +147,11 @@ const Home: React.FC = () => {
           <IonTabs>
             <IonRouterOutlet>
               <Route exact path="/loans">
-                <Loans loans={loans} setLoans={setLoans} indexedDBService={db} />
+                <Loans
+                  loans={loans}
+                  setLoans={setLoans}
+                  indexedDBService={db}
+                />
               </Route>
               {/* <Route exact path="/tab2">
                 <Tab2 />
