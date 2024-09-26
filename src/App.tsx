@@ -30,6 +30,7 @@ import { Toast } from "@capacitor/toast";
 import { useEffect, useState } from "react";
 import Home from "./pages/Home";
 import "./theme/variables.css";
+import Onboarding from "./components/Onboarding";
 
 setupIonicReact();
 
@@ -38,14 +39,13 @@ const App: React.FC = () => {
   const [notifications, setnotifications] = useState(nullEntry);
 
   useEffect(() => {
-    showToast("Initializing Push Notifications...");
     PushNotifications.checkPermissions().then((res) => {
       if (res.receive !== "granted") {
         PushNotifications.requestPermissions().then((res) => {
           if (res.receive === "denied") {
-            showToast("Push Notification permission denied");
+            //showToast("Push Notification permission denied");
           } else {
-            showToast("Push Notification permission granted");
+            //showToast("Push Notification permission granted");
             register();
           }
         });
@@ -120,10 +120,10 @@ const App: React.FC = () => {
 
   return (
     <IonApp>
-      {/* <IonButton color="success" expand="full" onClick={register}>Register for Push</IonButton> */}
       <IonReactRouter>
         <Route exact path="/" component={Splash} />
         <Route exact path="/home" component={Home} />
+        <Route exact path="/onboarding" component={Onboarding} />
         <Redirect from="*" to="/"></Redirect>
       </IonReactRouter>
     </IonApp>

@@ -89,7 +89,7 @@ const Modal = ({ setLoans, isOpen, closeModal, editableLoan, indexedDBService }:
   };
 
   const handleAmountChange = (event: CustomEvent) => {
-    const rawValue = event.detail.value.replace(/\./g, '');
+    const rawValue = event.detail.value.replace(/\D/g, "");
     const formattedValue = formatAmount(rawValue);
     setValue('amount', formattedValue);
   };
@@ -320,7 +320,7 @@ const Modal = ({ setLoans, isOpen, closeModal, editableLoan, indexedDBService }:
               </IonItem>
             )}
 
-            <IonButton expand="block" type="submit">{buttonText}</IonButton>
+            <IonButton className="button-submit" expand="block" type="submit">{buttonText}</IonButton>
           </form>
         </IonContent>
       </IonModal>

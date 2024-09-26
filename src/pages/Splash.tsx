@@ -1,33 +1,39 @@
-import { IonButton, IonContent, IonPage, createAnimation } from '@ionic/react';
-import { useHistory } from 'react-router-dom';
-import { useEffect, useRef } from 'react';
-import './Splash.css';
+import { IonButton, IonContent, IonPage, createAnimation } from "@ionic/react";
+import { useHistory } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import "./Splash.css";
 
 const Splash: React.FC = () => {
   const navigate = useHistory();
-  setTimeout(() => {
-    navigate.push('/home');
-  }, 2500);
 
   const basicAnimation = [
-    { offset: 0, transform: 'scale(0)' },
-    { offset: 1, transform: 'scale(1)' }
-  ]
+    { offset: 0, transform: "scale(0)" },
+    { offset: 1, transform: "scale(1)" },
+  ];
   const splashContainer = useRef<HTMLDivElement>(null);
 
   const playAnimation = () => {
     if (splashContainer.current !== null) {
       const animation = createAnimation()
-      .addElement(splashContainer.current)
-      .duration(250)
-      .keyframes(basicAnimation);
-      animation.play();
+        .addElement(splashContainer.current)
+        .duration(250)
+        .keyframes(basicAnimation);
+      animation.play().then(() => {
+        const hasSeenOnboarding = localStorage.getItem("hasSeenOnboarding");
+        setTimeout(() => {
+          if (hasSeenOnboarding) {
+            navigate.push("/home");
+          } else {
+            navigate.push("/onboarding");
+          }
+        }, 2500);
+      });
     }
-  }
+  };
 
   useEffect(() => {
-    playAnimation()
-  })
+    playAnimation();
+  }, []);
 
   return (
     <IonPage>

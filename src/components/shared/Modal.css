@@ -13,3 +13,8 @@
   opacity: 1;
   transform: translateY(0);
 }
+
+.button-submit {
+  text-transform: none;
+  letter-spacing: normal;
+}
