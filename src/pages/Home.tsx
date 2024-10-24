@@ -1,4 +1,10 @@
 import {
+  AdMob,
+  AdOptions,
+  InterstitialAdPluginEvents,
+} from "@capacitor-community/admob";
+import { Capacitor } from "@capacitor/core";
+import {
   IonApp,
   IonIcon,
   IonLabel,
@@ -10,27 +16,18 @@ import {
 } from "@ionic/react";
 import { IonReactRouter } from "@ionic/react-router";
 import { walletOutline } from "ionicons/icons";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Redirect, Route } from "react-router";
 import { Loan } from "../models/Loan";
 import { IndexedDBService } from "../persistence/IndexedDBService";
 import Loans from "./Loans";
-import {
-  AdMob,
-  AdOptions,
-  InterstitialAdPluginEvents,
-} from "@capacitor-community/admob";
-import { isPlatform } from "@ionic/react";
-import { Capacitor } from "@capacitor/core";
 
 const Home: React.FC = () => {
   const [loans, setLoans] = useState<Loan[]>([]);
   const db = IndexedDBService.getInstance();
-  const isInitialized = useRef(false);
   const [isAdVisible, setIsAdVisible] = useState(true);
 
   const fetchLoans = async (from: string = "No identificado") => {
-    // console.log("fetchLoans desde: ", from);
     try {
       const loans = await db.getAllLoans();
       sortLoans(loans);
@@ -148,15 +145,21 @@ const Home: React.FC = () => {
             <IonRouterOutlet>
               <Route exact path="/loans">
                 <Loans
-                  loans={loans}
+                  loans={loans.filter((loan: Loan) => loan.type === "loan")}
                   setLoans={setLoans}
                   indexedDBService={db}
+                  recordType="loan"
                 />
               </Route>
-              {/* <Route exact path="/tab2">
-                <Tab2 />
+              <Route exact path="/debts">
+              <Loans
+                  loans={loans.filter((loan: Loan) => loan.type === "debt")}
+                  setLoans={setLoans}
+                  indexedDBService={db}
+                  recordType="debt"
+                />
               </Route>
-              <Route path="/tab3">
+              {/* <Route path="/tab3">
                 <Tab3 />
               </Route> */}
               <Route exact path="/home">
@@ -169,11 +172,11 @@ const Home: React.FC = () => {
                 <IonIcon aria-hidden="true" icon={walletOutline} />
                 <IonLabel>Préstamos</IonLabel>
               </IonTabButton>
-              {/* <IonTabButton tab="tab2" href="/tab2">
-                <IonIcon aria-hidden="true" icon={ellipse} />
-                <IonLabel>Tab 2</IonLabel>
+              <IonTabButton tab="debts" href="/debts">
+                <IonIcon aria-hidden="true" icon={walletOutline} />
+                <IonLabel>Deudas</IonLabel>
               </IonTabButton>
-              <IonTabButton tab="tab3" href="/tab3">
+              {/* <IonTabButton tab="tab3" href="/tab3">
                 <IonIcon aria-hidden="true" icon={square} />
                 <IonLabel>Tab 3</IonLabel>
               </IonTabButton> */}

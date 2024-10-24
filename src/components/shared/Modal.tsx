@@ -1,4 +1,20 @@
-import { IonButton, IonButtons, IonContent, IonDatetime, IonDatetimeButton, IonHeader, IonInput, IonItem, IonLabel, IonModal, IonTitle, IonToolbar, IonCheckbox, IonIcon, IonPopover } from "@ionic/react";
+import {
+  IonButton,
+  IonButtons,
+  IonContent,
+  IonDatetime,
+  IonDatetimeButton,
+  IonHeader,
+  IonInput,
+  IonItem,
+  IonLabel,
+  IonModal,
+  IonTitle,
+  IonToolbar,
+  IonCheckbox,
+  IonIcon,
+  IonPopover,
+} from "@ionic/react";
 import { OverlayEventDetail } from "@ionic/react/dist/types/components/react-component-lib/interfaces";
 import { useRef, useState, useEffect } from "react";
 import { generateUniqueId, replaceAll } from "../../utilities/transform";
@@ -6,8 +22,8 @@ import { Loan } from "../../models/Loan";
 import { IndexedDBService } from "../../persistence/IndexedDBService";
 import { useForm, useWatch } from "react-hook-form";
 import { ErrorMessage } from "@hookform/error-message";
-import { helpCircleOutline } from 'ionicons/icons';
-import './Modal.css';
+import { helpCircleOutline } from "ionicons/icons";
+import "./Modal.css";
 
 interface ModalProps {
   setLoans: any;
@@ -15,9 +31,19 @@ interface ModalProps {
   closeModal: () => void;
   editableLoan: Loan | undefined;
   indexedDBService: IndexedDBService;
+  recordType: "loan" | "debt";
 }
 
-const Modal = ({ setLoans, isOpen, closeModal, editableLoan, indexedDBService }: ModalProps) => {
+// TODO: Ajustar disposicion de los elementos dentro del label de tasa de interes
+
+const Modal = ({
+  setLoans,
+  isOpen,
+  closeModal,
+  editableLoan,
+  indexedDBService,
+  recordType,
+}: ModalProps) => {
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString());
   const [buttonText, setButtonText] = useState<string>("Agregar");
   const [totalAmount, setTotalAmount] = useState<number>(0);
@@ -32,16 +58,16 @@ const Modal = ({ setLoans, isOpen, closeModal, editableLoan, indexedDBService }:
     clearErrors,
     reset,
     setValue,
-    watch
+    watch,
   } = useForm({
     criteriaMode: "all",
     defaultValues: {
       debtor: "",
       amount: "",
       interest: "",
-      date: new Date().toISOString().split('T')[0],
-      concept: "" // default value for concept
-    }
+      date: new Date().toISOString().split("T")[0],
+      concept: "", // default value for concept
+    },
   });
 
   useEffect(() => {
@@ -52,7 +78,7 @@ const Modal = ({ setLoans, isOpen, closeModal, editableLoan, indexedDBService }:
         amount: formatAmount(editableLoan.amount.toString()),
         interest: editableLoan.interestRate.toString(),
         date: editableLoan.payDate,
-        concept: editableLoan.concept || "" // reset concept if exists
+        concept: editableLoan.concept || "", // reset concept if exists
       });
       setSelectedDate(editableLoan.payDate);
       setIsPayed(editableLoan.isPayed!); // Set the checkbox value
@@ -62,8 +88,8 @@ const Modal = ({ setLoans, isOpen, closeModal, editableLoan, indexedDBService }:
         debtor: "",
         amount: "",
         interest: "",
-        date: new Date().toISOString().split('T')[0],
-        concept: "" // reset concept
+        date: new Date().toISOString().split("T")[0],
+        concept: "", // reset concept
       });
       setSelectedDate(new Date().toISOString());
       setIsPayed(false); // Reset the checkbox value
@@ -76,8 +102,8 @@ const Modal = ({ setLoans, isOpen, closeModal, editableLoan, indexedDBService }:
         debtor: "",
         amount: "",
         interest: "",
-        date: new Date().toISOString().split('T')[0],
-        concept: "" // reset concept
+        date: new Date().toISOString().split("T")[0],
+        concept: "", // reset concept
       });
       setSelectedDate(new Date().toISOString());
       setIsPayed(false); // Reset the checkbox value
@@ -91,19 +117,19 @@ const Modal = ({ setLoans, isOpen, closeModal, editableLoan, indexedDBService }:
   const handleAmountChange = (event: CustomEvent) => {
     const rawValue = event.detail.value.replace(/\D/g, "");
     const formattedValue = formatAmount(rawValue);
-    setValue('amount', formattedValue);
+    setValue("amount", formattedValue);
   };
 
   const calculateTotalAmount = (amount: number, interest: number) => {
-    return amount + (amount * interest / 100);
+    return amount + (amount * interest) / 100;
   };
 
-  const watchedAmount = watch('amount');
-  const watchedInterest = watch('interest');
+  const watchedAmount = watch("amount");
+  const watchedInterest = watch("interest");
 
   useEffect(() => {
-    const amount = Number(replaceAll(watchedAmount ?? '', '.', ''));
-    const interest = Number(watchedInterest ?? '');
+    const amount = Number(replaceAll(watchedAmount ?? "", ".", ""));
+    const interest = Number(watchedInterest ?? "");
     if (!isNaN(amount) && !isNaN(interest)) {
       setTotalAmount(calculateTotalAmount(amount, interest));
     } else {
@@ -112,15 +138,16 @@ const Modal = ({ setLoans, isOpen, closeModal, editableLoan, indexedDBService }:
   }, [watchedAmount, watchedInterest]);
 
   function onWillDismiss(ev: CustomEvent<OverlayEventDetail>) {
-    if (ev.detail.role === 'confirm') {
+    if (ev.detail.role === "confirm") {
       const loanData = {
         id: editableLoan ? editableLoan.id : generateUniqueId(),
         name: ev.detail.data.debtor,
-        amount: Number(replaceAll(ev.detail.data.amount, '.', '')),
+        amount: Number(replaceAll(ev.detail.data.amount, ".", "")),
         interestRate: ev.detail.data.interest,
         payDate: selectedDate,
         concept: ev.detail.data.concept, // add concept to loanData
-        isPayed: editableLoan ? isPayed : false // Update isPayed based on the checkbox
+        isPayed: editableLoan ? isPayed : false, // Update isPayed based on the checkbox
+        type: recordType,
       };
 
       if (editableLoan) {
@@ -142,36 +169,62 @@ const Modal = ({ setLoans, isOpen, closeModal, editableLoan, indexedDBService }:
   const onSubmit = (data: any) => {
     const { debtor, amount, interest, date: payDate, concept } = data; // add concept to destructured data
     const formData = { debtor, amount, interest, payDate, concept }; // add concept to formData
-    modal.current?.dismiss(formData, 'confirm');
-  }
+    modal.current?.dismiss(formData, "confirm");
+  };
 
   return (
     <>
-      <IonModal ref={modal} isOpen={isOpen} onWillDismiss={(ev) => onWillDismiss(ev)}
-        onIonModalDidDismiss={closeModal}>
+      <IonModal
+        ref={modal}
+        isOpen={isOpen}
+        onWillDismiss={(ev) => onWillDismiss(ev)}
+        onIonModalDidDismiss={closeModal}
+      >
         <IonHeader>
           <IonToolbar>
             <IonButtons slot="start">
-              <IonButton onClick={() => modal.current?.dismiss()}>Cancelar</IonButton>
+              <IonButton onClick={() => modal.current?.dismiss()}>
+                Cancelar
+              </IonButton>
             </IonButtons>
             <IonTitle color="primary">
-              {editableLoan ? 'Editar Préstamo' : 'Nuevo Préstamo'}
+              {(() => {
+                const titles = {
+                  loan: editableLoan ? "Editar Préstamo" : "Nuevo Préstamo",
+                  debt: editableLoan ? "Editar deuda" : "Nueva deuda",
+                };
+
+                return titles[recordType];
+              })()}
             </IonTitle>
           </IonToolbar>
         </IonHeader>
         <IonContent className="ion-padding">
-
           <form onSubmit={handleSubmit(onSubmit)}>
             <IonItem>
               <IonInput
-                label="Nombre del deudor"
+                label={(() => {
+                  const titles = {
+                    loan: "Nombre del deudor",
+                    debt: "¿Quién te hace el préstamo?",
+                  };
+
+                  return titles[recordType];
+                })()}
                 labelPlacement="stacked"
                 {...register("debtor", {
-                  required: "¿A quién le vas a prestar?",
+                  required: (() => {
+                    const titles = {
+                      loan: "¿A quién le vas a prestar?",
+                      debt: "¿Quién te va a prestar?",
+                    };
+
+                    return titles[recordType];
+                  })(),
                   minLength: {
                     value: 3,
-                    message: "Este nombre parece corto"
-                  }
+                    message: "Este nombre parece corto",
+                  },
                 })}
                 type="text"
                 placeholder="Nombre"
@@ -183,8 +236,14 @@ const Modal = ({ setLoans, isOpen, closeModal, editableLoan, indexedDBService }:
                 render={({ messages }) => {
                   return messages
                     ? Object.entries(messages).map(([type, message]) => (
-                      <IonLabel className="ion-text-alert error-message show" color="danger" key={type}>{message}</IonLabel>
-                    ))
+                        <IonLabel
+                          className="ion-text-alert error-message show"
+                          color="danger"
+                          key={type}
+                        >
+                          {message}
+                        </IonLabel>
+                      ))
                     : null;
                 }}
               />
@@ -194,16 +253,30 @@ const Modal = ({ setLoans, isOpen, closeModal, editableLoan, indexedDBService }:
               <IonInput
                 label="Cantidad a prestar"
                 labelPlacement="stacked"
-                {...register('amount', {
-                  required: "¿Cuánto vas a prestar?",
+                {...register("amount", {
+                  required: (() => {
+                    const titles = {
+                      loan: "¿Cuánto vas a prestar?",
+                      debt: "¿Cuánto te van a prestar?",
+                    };
+
+                    return titles[recordType];
+                  })(),
                   min: {
                     value: 1,
-                    message: "¿Cuánto vas a prestar?"
+                    message:  (() => {
+                      const titles = {
+                        loan: "¿Cuánto vas a prestar?",
+                        debt: "¿Cuánto te van a prestar?",
+                      };
+  
+                      return titles[recordType];
+                    })(),
                   },
                   max: {
                     value: 999999999,
-                    message: "Puedes prestar máximo $999.999.999"
-                  }
+                    message: "Puedes prestar máximo $999.999.999",
+                  },
                 })}
                 type="text"
                 placeholder="Monto"
@@ -216,8 +289,14 @@ const Modal = ({ setLoans, isOpen, closeModal, editableLoan, indexedDBService }:
                 render={({ messages }) => {
                   return messages
                     ? Object.entries(messages).map(([type, message]) => (
-                      <IonLabel className="ion-text-alert error-message show" color="danger" key={type}>{message}</IonLabel>
-                    ))
+                        <IonLabel
+                          className="ion-text-alert error-message show"
+                          color="danger"
+                          key={type}
+                        >
+                          {message}
+                        </IonLabel>
+                      ))
                     : null;
                 }}
               />
@@ -227,9 +306,12 @@ const Modal = ({ setLoans, isOpen, closeModal, editableLoan, indexedDBService }:
               <IonInput
                 label="¿Tasa de interés?"
                 labelPlacement="stacked"
-                {...register('interest', {
+                {...register("interest", {
                   required: "Define un porcentaje de interés",
-                  max: { value: 100, message: "El porcentaje no puede ser mayor a 100%" }
+                  max: {
+                    value: 100,
+                    message: "El porcentaje no puede ser mayor a 100%",
+                  },
                 })}
                 type="number"
                 placeholder="Porcentaje"
@@ -238,9 +320,12 @@ const Modal = ({ setLoans, isOpen, closeModal, editableLoan, indexedDBService }:
               <IonButton id="interest-popover" slot="end" fill="clear">
                 <IonIcon icon={helpCircleOutline} />
               </IonButton>
-              <IonPopover  trigger="interest-popover" triggerAction="click">
+              <IonPopover trigger="interest-popover" triggerAction="click">
                 <IonContent className="ion-padding-horizontal">
-                  <p>El interés es el porcentaje adicional que se añadirá al monto total prestado.</p>
+                  <p>
+                    El interés es el porcentaje adicional que se añadirá al
+                    monto total prestado.
+                  </p>
                 </IonContent>
               </IonPopover>
               <ErrorMessage
@@ -249,28 +334,35 @@ const Modal = ({ setLoans, isOpen, closeModal, editableLoan, indexedDBService }:
                 render={({ messages }) => {
                   return messages
                     ? Object.entries(messages).map(([type, message]) => (
-                      <IonLabel className="ion-text-alert error-message show" color="danger" key={type}>{message}</IonLabel>
-                    ))
+                        <IonLabel
+                          className="ion-text-alert error-message show"
+                          color="danger"
+                          key={type}
+                        >
+                          {message}
+                        </IonLabel>
+                      ))
                     : null;
                 }}
               />
             </IonItem>
 
-
-
             <IonItem>
               <IonLabel>Fecha de pago</IonLabel>
-              <IonDatetimeButton datetime="datetime" mode='ios'></IonDatetimeButton>
+              <IonDatetimeButton
+                datetime="datetime"
+                mode="ios"
+              ></IonDatetimeButton>
 
               <IonModal keepContentsMounted={true}>
                 <IonDatetime
-                  presentation='date'
+                  presentation="date"
                   id="datetime"
                   showDefaultButtons={true}
                   min={new Date().toISOString()}
                   value={selectedDate}
                   onIonChange={(e) => {
-                    if (typeof e.detail.value === 'string') {
+                    if (typeof e.detail.value === "string") {
                       setSelectedDate(e.detail.value);
                     }
                   }}
@@ -286,8 +378,8 @@ const Modal = ({ setLoans, isOpen, closeModal, editableLoan, indexedDBService }:
                   required: "¿Cuál es el concepto del préstamo?",
                   minLength: {
                     value: 3,
-                    message: "Este concepto parece corto"
-                  }
+                    message: "Este concepto parece corto",
+                  },
                 })}
                 type="text"
                 placeholder="Concepto"
@@ -299,15 +391,23 @@ const Modal = ({ setLoans, isOpen, closeModal, editableLoan, indexedDBService }:
                 render={({ messages }) => {
                   return messages
                     ? Object.entries(messages).map(([type, message]) => (
-                      <IonLabel className="ion-text-alert error-message show" color="danger" key={type}>{message}</IonLabel>
-                    ))
+                        <IonLabel
+                          className="ion-text-alert error-message show"
+                          color="danger"
+                          key={type}
+                        >
+                          {message}
+                        </IonLabel>
+                      ))
                     : null;
                 }}
               />
             </IonItem>
 
             <IonItem>
-              <IonLabel color="success">Total a pagar: ${totalAmount.toLocaleString()}</IonLabel>
+              <IonLabel color="success">
+                Total a pagar: ${totalAmount.toLocaleString()}
+              </IonLabel>
             </IonItem>
 
             {editableLoan && editableLoan.isPayed && (
@@ -320,12 +420,14 @@ const Modal = ({ setLoans, isOpen, closeModal, editableLoan, indexedDBService }:
               </IonItem>
             )}
 
-            <IonButton className="button-submit" expand="block" type="submit">{buttonText}</IonButton>
+            <IonButton className="button-submit" expand="block" type="submit">
+              {buttonText}
+            </IonButton>
           </form>
         </IonContent>
       </IonModal>
     </>
   );
-}
+};
 
 export default Modal;

@@ -40,7 +40,7 @@ export class IndexedDBService {
       };
 
       request.onsuccess = (event) => {
-        console.log('Base de datos abierta correctamente');
+        // console.log('Base de datos abierta correctamente');
         this.db = (event.target as IDBOpenDBRequest).result;
         resolve();
       };
@@ -89,7 +89,7 @@ export class IndexedDBService {
    *
    * @return {Promise<Loan[]>} A promise that resolves with an array of loans
    */
-  public async getAllLoans(): Promise<Loan[]> {
+  public async getAllLoans(type: string = "loan"): Promise<Loan[]> {
     if (!this.db) {
       throw new Error('La base de datos no está abierta');
     }
@@ -101,6 +101,12 @@ export class IndexedDBService {
           const request = objectStore.getAll();
           request.onsuccess = () => {
             const loans: Loan[] = request.result;
+            loans.forEach((loan: Loan) => {
+              if (!loan.type) {
+                loan.type = "loan";
+                this.updateLoan(loan);
+              }
+            })
             resolve(loans);
           };
           request.onerror = () => {
@@ -157,7 +163,4 @@ export class IndexedDBService {
       }
     });
   }
-
-
-
 }
