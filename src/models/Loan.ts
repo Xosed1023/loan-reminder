@@ -8,4 +8,5 @@ export interface Loan {
   isPayed?: boolean,
   nameInitials?: string,
   concept: string,
+  type: string
 }
